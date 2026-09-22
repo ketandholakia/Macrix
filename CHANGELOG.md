@@ -22,6 +22,15 @@ CHANGELOG entry here, not just internal refactors (§43).
   CI files to LF.
 - **`docs/WORKFLOW.md`** — the end-to-end macro development loop.
 
+### Added — dimension-tools: caption colour + OK default button
+- **Text Color** setting: a `#RRGGBB` (also accepts `R,G,B` and `#RGB`) field, with a live
+  colour swatch beside it that previews as you type. The colour is applied to the label's
+  text fill in `modLabel.ApplyTextColor` and persisted with the other settings.
+- New helpers `ColorFromHex` / `ColorToHex` in `modUtils`.
+- **OK is now the default button** (Enter) and **Cancel answers Esc**, set on the controls
+  and re-asserted in `UserForm_Initialize`.
+- Form rebuilt: **30 controls**, 330×486 pt, re-exported to `forms/frmDimension.frm`.
+
 ### Changed — dimension-tools: Font Size dropped, Text Width % now works
 - **Removed the Font Size setting and control.** Labels are sized solely by
   `Text Width %` — a percentage of the selected object's width. `VDT_Settings.fontSize`,

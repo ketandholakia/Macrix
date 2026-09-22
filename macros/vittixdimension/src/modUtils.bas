@@ -57,3 +57,48 @@ End Function
 Public Function FormatArea(valueMM2 As Double, unit As VDTUnit, Optional decimals As Integer = 2) As String
     FormatArea = FormatValue(ConvertAreaFromMM2(valueMM2, unit), decimals) & " sq " & UnitSuffix(unit)
 End Function
+
+'--------------------------------------------------------------
+' Colours
+'--------------------------------------------------------------
+' Parse a colour string into an RGB Long (as produced by RGB()). Accepts
+' "#RRGGBB", "RRGGBB", "#RGB" or "R,G,B". Returns -1 when unparseable.
+Public Function ColorFromHex(ByVal value As String) As Long
+    On Error GoTo Bad
+    Dim s As String
+    Dim parts() As String
+    ColorFromHex = -1
+
+    s = SafeTrim(value)
+    If Len(s) = 0 Then Exit Function
+
+    If InStr(s, ",") > 0 Then
+        parts = Split(s, ",")
+        If UBound(parts) <> 2 Then Exit Function
+        ColorFromHex = RGB(CInt(SafeTrim(parts(0))), CInt(SafeTrim(parts(1))), CInt(SafeTrim(parts(2))))
+        Exit Function
+    End If
+
+    s = Replace(s, "#", "")
+    s = Replace(s, " ", "")
+    If Len(s) = 3 Then
+        s = Mid$(s, 1, 1) & Mid$(s, 1, 1) & Mid$(s, 2, 1) & Mid$(s, 2, 1) & Mid$(s, 3, 1) & Mid$(s, 3, 1)
+    End If
+    If Len(s) <> 6 Then Exit Function
+    ColorFromHex = RGB(CLng("&H" & Mid$(s, 1, 2) & "&"), CLng("&H" & Mid$(s, 3, 2) & "&"), CLng("&H" & Mid$(s, 5, 2) & "&"))
+    Exit Function
+Bad:
+    ColorFromHex = -1
+End Function
+
+' RGB Long -> "#RRGGBB" (for showing a stored colour in a text box).
+Public Function ColorToHex(ByVal rgbValue As Long) As String
+    On Error Resume Next
+    If rgbValue < 0 Then
+        ColorToHex = "#000000"
+        Exit Function
+    End If
+    ColorToHex = "#" & Right$("0" & Hex$(rgbValue And &HFF), 2) & _
+        Right$("0" & Hex$((rgbValue \ &H100) And &HFF), 2) & _
+        Right$("0" & Hex$((rgbValue \ &H10000) And &HFF), 2)
+End Function

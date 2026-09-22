@@ -126,7 +126,7 @@ Public Function CreateArtisticTextShape(doc As Document, x As Double, y As Doubl
     Set CreateArtisticTextShape = sh
     If sh Is Nothing Then Exit Function
 
-    ApplyTextFormatting sh
+    ApplyTextFormatting sh, settings
 
     ' Scale the label to a percentage of the selected object's width.
     If objectWidthMM > 0 And settings.TextWidthPercent > 0 Then
@@ -137,9 +137,9 @@ ErrHandler:
     LogError "CreateArtisticTextShape", Err.Number, Err.Description
 End Function
 
-' Font name and size live on the Story (a TextRange). IMPORTANT: the size member is
-' .Size -- there is no .FontSize / .FontName, and those fail silently.
-Private Sub ApplyTextFormatting(sh As shape)
+' Font name, size and colour live on the Story (a TextRange). IMPORTANT: the size
+' member is .Size -- there is no .FontSize / .FontName, and those fail silently.
+Private Sub ApplyTextFormatting(sh As shape, settings As VDT_Settings)
     On Error GoTo ErrHandler
     Dim story As Object
     If sh Is Nothing Then Exit Sub
@@ -147,9 +147,27 @@ Private Sub ApplyTextFormatting(sh As shape)
     If story Is Nothing Then Exit Sub
     story.Font = "Arial"
     story.Size = DEFAULT_TEXT_POINTS
+    ApplyTextColor sh, settings.TextColor
     Exit Sub
 ErrHandler:
     LogError "ApplyTextFormatting", Err.Number, Err.Description
+End Sub
+
+' Colour the caption. For artistic text the visible colour is the shape's fill.
+Private Sub ApplyTextColor(sh As shape, ByVal colorText As String)
+    On Error GoTo ErrHandler
+    Dim c As Long
+    Dim r As Long, g As Long, b As Long
+    If sh Is Nothing Then Exit Sub
+    c = ColorFromHex(colorText)
+    If c < 0 Then Exit Sub
+    r = c And &HFF
+    g = (c \ &H100) And &HFF
+    b = (c \ &H10000) And &HFF
+    sh.Fill.UniformColor.RGBAssign r, g, b
+    Exit Sub
+ErrHandler:
+    LogError "ApplyTextColor", Err.Number, Err.Description
 End Sub
 
 ' Scale the label so its rendered width equals `widthPercent` % of the object width.

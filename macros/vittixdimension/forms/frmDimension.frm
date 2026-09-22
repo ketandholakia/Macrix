@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmDimension 
    Caption         =   "Vittix Dimension"
-   ClientHeight    =   8685.001
+   ClientHeight    =   9285.001
    ClientLeft      =   45
    ClientTop       =   390
    ClientWidth     =   6510
@@ -17,6 +17,18 @@ Option Explicit
 
 Private Sub UserForm_Initialize()
     LoadFormState
+    On Error Resume Next
+    ' Enter activates OK, Esc activates Cancel.
+    cmdOK.Default = True
+    cmdCancel.Cancel = True
+End Sub
+
+' Live preview of the caption colour as it is typed (#RRGGBB or R,G,B).
+Private Sub txtTextColor_Change()
+    On Error Resume Next
+    Dim c As Long
+    c = ColorFromHex(txtTextColor.text)
+    If c >= 0 Then lblColorSwatch.BackColor = c
 End Sub
 
 Public Sub LoadFormState()

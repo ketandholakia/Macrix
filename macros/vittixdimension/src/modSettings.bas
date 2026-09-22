@@ -6,6 +6,7 @@ Public Type VDT_Settings
     unit As VDTUnit
     decimals As Integer
     Position As String
+    TextColor As String
     TextWidthPercent As Double
     Gap As Double
     Padding As Double
@@ -39,6 +40,7 @@ Public Sub LoadDefaultSettings(ByRef settings As VDT_Settings)
     settings.unit = UNIT_MM
     settings.decimals = 2
     settings.Position = "Auto"
+    settings.TextColor = "#000000"
     settings.TextWidthPercent = 50
     settings.Gap = 2
     settings.Padding = 2
@@ -71,6 +73,7 @@ Private Sub PersistSettings(ByRef settings As VDT_Settings)
     SaveSetting "Vittix", "DimensionTools", "Unit", CStr(settings.unit)
     SaveSetting "Vittix", "DimensionTools", "Decimals", CStr(settings.decimals)
     SaveSetting "Vittix", "DimensionTools", "Position", settings.Position
+    SaveSetting "Vittix", "DimensionTools", "TextColor", settings.TextColor
     SaveSetting "Vittix", "DimensionTools", "TextWidthPercent", CStr(settings.TextWidthPercent)
     SaveSetting "Vittix", "DimensionTools", "Gap", CStr(settings.Gap)
     SaveSetting "Vittix", "DimensionTools", "Padding", CStr(settings.Padding)
@@ -92,6 +95,7 @@ Private Sub LoadPersistedSettings(ByRef settings As VDT_Settings)
     settings.unit = CLng(GetSetting("Vittix", "DimensionTools", "Unit", CStr(settings.unit)))
     settings.decimals = CInt(GetSetting("Vittix", "DimensionTools", "Decimals", CStr(settings.decimals)))
     settings.Position = GetSetting("Vittix", "DimensionTools", "Position", settings.Position)
+    settings.TextColor = GetSetting("Vittix", "DimensionTools", "TextColor", settings.TextColor)
     settings.TextWidthPercent = CDbl(GetSetting("Vittix", "DimensionTools", "TextWidthPercent", CStr(settings.TextWidthPercent)))
     settings.Gap = CDbl(GetSetting("Vittix", "DimensionTools", "Gap", CStr(settings.Gap)))
     settings.Padding = CDbl(GetSetting("Vittix", "DimensionTools", "Padding", CStr(settings.Padding)))
@@ -114,6 +118,7 @@ Public Sub ApplySettingsToForm(frm As Object)
     frm.cmbDecimals.value = CStr(gSettings.decimals)
     frm.cmbPosition.value = gSettings.Position
     If Not frm.txtTextWidthPercent Is Nothing Then frm.txtTextWidthPercent.text = CStr(gSettings.TextWidthPercent)
+    If Not frm.txtTextColor Is Nothing Then frm.txtTextColor.text = gSettings.TextColor
     frm.txtGap.text = CStr(gSettings.Gap)
     frm.txtPadding.text = CStr(gSettings.Padding)
     frm.txtCornerRadius.text = CStr(gSettings.CornerRadius)
@@ -138,6 +143,7 @@ Public Sub ReadSettingsFromForm(frm As Object, ByRef settings As VDT_Settings)
     If Not frm.txtTextWidthPercent Is Nothing Then
         If TryParseDouble(CStr(frm.txtTextWidthPercent.text), parsedDouble) Then settings.TextWidthPercent = parsedDouble
     End If
+    If Not frm.txtTextColor Is Nothing Then settings.TextColor = SafeTrim(CStr(frm.txtTextColor.text))
     If TryParseDouble(CStr(frm.txtGap.text), parsedDouble) Then settings.Gap = parsedDouble
     If TryParseDouble(CStr(frm.txtPadding.text), parsedDouble) Then settings.Padding = parsedDouble
     If TryParseDouble(CStr(frm.txtCornerRadius.text), parsedDouble) Then settings.CornerRadius = parsedDouble
