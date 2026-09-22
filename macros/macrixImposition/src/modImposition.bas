@@ -77,9 +77,12 @@ Public Sub RunImposition()
     outDoc.Unit = g_Unit
     outDoc.ReferencePoint = cdrTopLeft
 
-    ' Clipboard work needs events ENABLED. With EventsEnabled = False the Copy below
-    ' silently copies nothing, so every Paste comes back empty -- which is why the
-    ' placement found zero new shapes on the sheet page.
+    ' The placement below copies and pastes shapes. That round-trip needs a fully live
+    ' document context: with Optimization or EventsEnabled switched off, Copy silently
+    ' copies nothing, so every Paste comes back empty and the sheet ends up holding only
+    ' the crop marks. Diagnostics showed the source page had a shape while the sheet
+    ' page count never increased, so both are switched back on for the loop.
+    Application.Optimization = False
     Application.EventsEnabled = True
 
     slotIndex = LBound(orderArr)
@@ -245,40 +248,46 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
 
     If srcPage.Shapes.Count = 0 Then Exit Sub ' nothing to place
 
-    ' Switch context to source doc to select + copy its page content
-    srcDoc.Activate
+    ' Copy the source page's shapes STRAIGHT onto the sheet page's layer.
+    ' The clipboard route (Shapes.All.Copy + Layer.Paste) put nothing on the clipboard in
+    ' this project, which is why the sheet page ended up holding only crop marks.
     Set srcShapes = srcPage.Shapes.All
-    srcShapes.Copy
+    If srcShapes Is Nothing Then Exit Sub
 
-    ' Switch to output doc, paste onto the target page.
-    ' NOTE: Paste lives on Layer (and on Page.ActiveLayer) -- NOT on Document, so
-    ' outDoc.Paste raises "Run-time error 438: Object doesn't support this property
-    ' or method".
-    outDoc.Activate
-    outPage.Activate
-
-    ' Identify the pasted shapes by counting before/after. Both Layer.Paste and
-    ' Document.Selection are pointer-typed members that VBA can surface as Nothing even
-    ' when they succeed -- that is what raised "Run-time error 91" on SetPosition.
     Set beforeShapes = outPage.Shapes.All
     beforeCount = beforeShapes.Count
-    outPage.ActiveLayer.Paste
+    srcShapes.CopyToLayer outPage.ActiveLayer
+    Set dupShapes = p_NewShapesSince(outPage, beforeCount)
 
-    Set dupShapes = New ShapeRange
-    For i = beforeCount + 1 To outPage.Shapes.Count
-        dupShapes.Add outPage.Shapes(i)
-    Next i
+    ' Fallback: clipboard round-trip, with the source shapes selected first.
+    If dupShapes.Count = 0 Then
+        srcDoc.Activate
+        srcShapes.CreateSelection
+        srcShapes.Copy
+        outDoc.Activate
+        outPage.Activate
+        outPage.ActiveLayer.Paste
+        Set dupShapes = p_NewShapesSince(outPage, beforeCount)
+    End If
 
     If dupShapes.Count = 0 Then
-        ' Nothing landed on the sheet page. Surface the counts instead of failing
+        ' Nothing landed on the sheet page. Report the counts rather than failing
         ' silently (and do NOT fall back to Document.Selection -- it is a pointer-typed
         ' member that raises "Run-time error 13: Type mismatch" when assigned in VBA).
+        Dim srcLocked As Boolean
+        Dim srcLayer As String
+        srcLocked = False
+        srcLayer = "?"
+        On Error Resume Next
+        srcLocked = srcPage.Shapes(1).Locked
+        srcLayer = srcPage.ActiveLayer.Name
+        On Error GoTo 0
         MsgBox "Nothing was pasted for source page " & CStr(srcPageIdx) & "." & vbCrLf & vbCrLf & _
                "Shapes on the source page      : " & CStr(srcPage.Shapes.Count) & vbCrLf & _
+               "First source shape locked      : " & CStr(srcLocked) & vbCrLf & _
+               "Source active layer            : " & srcLayer & vbCrLf & _
                "Shapes on the sheet page before: " & CStr(beforeCount) & vbCrLf & _
-               "Shapes on the sheet page after : " & CStr(outPage.Shapes.Count) & vbCrLf & vbCrLf & _
-               "If the source count is 0, or the source objects sit on a locked layer, " & _
-               "Copy copies nothing and the paste comes back empty.", _
+               "Shapes on the sheet page after : " & CStr(outPage.Shapes.Count), _
                vbExclamation, "Imposition"
         Exit Sub
     End If
@@ -298,6 +307,19 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
     originalActiveDoc.Activate
 
 End Sub
+
+' Collect the shapes added to a page since a given count (CopyToLayer/Paste return
+' pointer-typed values that VBA can surface as Nothing, so count instead).
+Private Function p_NewShapesSince(thePage As Page, ByVal sinceCount As Long) As ShapeRange
+    On Error Resume Next
+    Dim result As ShapeRange
+    Dim k As Long
+    Set result = New ShapeRange
+    For k = sinceCount + 1 To thePage.Shapes.Count
+        result.Add thePage.Shapes(k)
+    Next k
+    Set p_NewShapesSince = result
+End Function
 
 '--------------------------------------------------------------
 ' Draws 8 short crop-mark lines (2 per corner) just outside the
