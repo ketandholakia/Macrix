@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmDimension 
    Caption         =   "Vittix Dimension"
-   ClientHeight    =   9285.001
+   ClientHeight    =   8685.001
    ClientLeft      =   45
    ClientTop       =   390
    ClientWidth     =   6510

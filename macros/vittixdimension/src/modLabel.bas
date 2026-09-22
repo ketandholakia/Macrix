@@ -2,6 +2,10 @@ Attribute VB_Name = "modLabel"
 Option Explicit
 Rem modLabel.bas - label creation and styling
 
+' Base point size used when building a label. The label is then scaled to a
+' percentage of the selected object's width, so this is only a starting point.
+Private Const DEFAULT_TEXT_POINTS As Double = 12#
+
 Public Function Label_BuildText(styleName As String, info As VDT_DimensionInfo, settings As VDT_Settings) As String
     Dim baseText As String
     
@@ -54,7 +58,7 @@ Public Function CreateDimensionLabel(doc As Document, x As Double, y As Double, 
     Dim boxShape As shape
     Dim finalShape As shape
     If doc Is Nothing Then Exit Function
-    Set textShape = CreateArtisticTextShape(doc, x, y, text, CDbl(settings.fontSize), settings, objectWidthMM)
+    Set textShape = CreateArtisticTextShape(doc, x, y, text, settings, objectWidthMM)
     If textShape Is Nothing Then Exit Function
     
     Set finalShape = textShape
@@ -107,65 +111,81 @@ Private Sub RotateShape(shapeObj As shape, ByVal angleDeg As Double)
     shapeObj.Rotate angleDeg
 End Sub
 
-Public Function CreateArtisticTextShape(doc As Document, x As Double, y As Double, text As String, ByVal fontSize As Double, settings As VDT_Settings, Optional objectWidthMM As Double = 0) As shape
-    On Error Resume Next
+' Build the label text shape. There is no font-size setting any more: the label is
+' sized by TextWidthPercent, i.e. a percentage of the selected object's width.
+Public Function CreateArtisticTextShape(doc As Document, x As Double, y As Double, text As String, settings As VDT_Settings, Optional objectWidthMM As Double = 0) As shape
+    On Error GoTo ErrHandler
     Dim targetLayer As Layer
+    Dim sh As shape
+
     Set targetLayer = ActiveTargetLayer(doc)
     If targetLayer Is Nothing Then Set targetLayer = doc.ActiveLayer
     If targetLayer Is Nothing Then Exit Function
 
-    Set CreateArtisticTextShape = targetLayer.CreateArtisticText(x, y, text)
-    If CreateArtisticTextShape Is Nothing Then Exit Function
-    
-    ' Set initial font
-    With CreateArtisticTextShape.Text.Story
-        .FontSize = fontSize
-        .FontName = "Arial"
-        If Not .TextRange Is Nothing Then
-            .TextRange.FontSize = fontSize
-            .TextRange.FontName = "Arial"
-        End If
-    End With
-    
-    ' Scale text width to match percentage of object width
+    Set sh = targetLayer.CreateArtisticText(x, y, text)
+    Set CreateArtisticTextShape = sh
+    If sh Is Nothing Then Exit Function
+
+    ApplyTextFormatting sh
+
+    ' Scale the label to a percentage of the selected object's width.
     If objectWidthMM > 0 And settings.TextWidthPercent > 0 Then
-        ScaleTextToWidth CreateArtisticTextShape, objectWidthMM, settings.TextWidthPercent
+        ScaleTextToWidth sh, objectWidthMM, settings.TextWidthPercent
     End If
+    Exit Function
+ErrHandler:
+    LogError "CreateArtisticTextShape", Err.Number, Err.Description
 End Function
 
-Private Sub ScaleTextToWidth(textShape As shape, objectWidthMM As Double, widthPercent As Double)
-    On Error Resume Next
+' Font name and size live on the Story (a TextRange). IMPORTANT: the size member is
+' .Size -- there is no .FontSize / .FontName, and those fail silently.
+Private Sub ApplyTextFormatting(sh As shape)
+    On Error GoTo ErrHandler
+    Dim story As Object
+    If sh Is Nothing Then Exit Sub
+    Set story = sh.Text.Story
+    If story Is Nothing Then Exit Sub
+    story.Font = "Arial"
+    story.Size = DEFAULT_TEXT_POINTS
+    Exit Sub
+ErrHandler:
+    LogError "ApplyTextFormatting", Err.Number, Err.Description
+End Sub
+
+' Scale the label so its rendered width equals `widthPercent` % of the object width.
+' CreateDimensionsForSelection sets the document unit to millimetres before labels
+' are created, so Shape.SizeWidth and objectWidthMM are both in mm here.
+Private Sub ScaleTextToWidth(sh As shape, ByVal objectWidthMM As Double, ByVal widthPercent As Double)
+    On Error GoTo ErrHandler
+    Dim story As Object
     Dim targetWidthMM As Double
     Dim currentWidthMM As Double
-    Dim scaleFactor As Double
-    Dim newFontSize As Double
-    
+    Dim currentSize As Double
+    Dim newSize As Double
+
+    If sh Is Nothing Then Exit Sub
+    If objectWidthMM <= 0 Or widthPercent <= 0 Then Exit Sub
+
+    Set story = sh.Text.Story
+    If story Is Nothing Then Exit Sub
+
+    currentWidthMM = sh.SizeWidth
+    If currentWidthMM <= 0 Then Exit Sub
+
+    currentSize = story.Size
+    If currentSize <= 0 Then currentSize = DEFAULT_TEXT_POINTS
+
     targetWidthMM = objectWidthMM * (widthPercent / 100#)
-    
-    ' Get current text width in document units (MM)
-    Dim doc As Document
-    Set doc = ActiveDocument
-    If doc Is Nothing Then Exit Sub
-    
-    Dim prevUnit As Long
-    prevUnit = doc.unit
-    doc.unit = cdrMillimeter
-    
-    currentWidthMM = textShape.SizeWidth
-    doc.unit = prevUnit
-    
-    If currentWidthMM > 0 Then
-        scaleFactor = targetWidthMM / currentWidthMM
-        newFontSize = textShape.Text.Story.FontSize * scaleFactor
-        
-        ' Apply scaled font size
-        With textShape.Text.Story
-            .FontSize = newFontSize
-            If Not .TextRange Is Nothing Then
-                .TextRange.FontSize = newFontSize
-            End If
-        End With
-    End If
+    If targetWidthMM <= 0 Then Exit Sub
+
+    newSize = currentSize * (targetWidthMM / currentWidthMM)
+    If newSize < 0.5 Then newSize = 0.5
+    If newSize > 2000# Then newSize = 2000#
+
+    story.Size = newSize
+    Exit Sub
+ErrHandler:
+    LogError "ScaleTextToWidth", Err.Number, Err.Description
 End Sub
 
 Private Function BuildMinimalLabel(info As VDT_DimensionInfo, settings As VDT_Settings) As String
@@ -250,10 +270,6 @@ Private Function ActiveTargetLayer(doc As Document) As Layer
     On Error Resume Next
     Set ActiveTargetLayer = doc.ActiveLayer
 End Function
-
-Private Sub ApplyFontSize(shapeObj As shape, fontSize As Double)
-    ' No longer used - font set directly in CreateArtisticTextShape
-End Sub
 
 Private Function CreateRectangleShape(doc As Document, leftX As Double, topY As Double, rightX As Double, bottomY As Double) As shape
     On Error GoTo ErrHandler

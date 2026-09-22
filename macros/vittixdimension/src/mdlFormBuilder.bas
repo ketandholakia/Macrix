@@ -63,11 +63,6 @@ Public Sub BuildDimensionFormWithCode()
     AddComboList d, "cmbPosition", 120, yPos - 3, 160, 20
     yPos = yPos + 30
 
-    ' Font Size
-    AddLabel d, "lblFontSize", "Font Size (pt)", 16, yPos, 100, 17
-    AddTextBox d, "txtFontSize", "", 120, yPos, 160, 20
-    yPos = yPos + 30
-
     ' Text Width %
     AddLabel d, "lblTextWidthPercent", "Text Width %", 16, yPos, 100, 17
     AddTextBox d, "txtTextWidthPercent", "", 120, yPos, 160, 20
@@ -201,7 +196,6 @@ Private Sub InjectCodeBehind(ByVal codeMod As Object)
     s = s & "    cmbPosition.AddItem ""Right""" & vbCrLf
     s = s & "    cmbPosition.ListIndex = PositionToIndex(gSettings.Position)" & vbCrLf
     s = s & "" & vbCrLf
-    s = s & "    txtFontSize.Text = gSettings.fontSize" & vbCrLf
     s = s & "    txtTextWidthPercent.Text = gSettings.TextWidthPercent" & vbCrLf
     s = s & "    txtGap.Text = gSettings.Gap" & vbCrLf
     s = s & "    txtPadding.Text = gSettings.Padding" & vbCrLf

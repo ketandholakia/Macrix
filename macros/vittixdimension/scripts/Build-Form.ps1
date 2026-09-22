@@ -64,23 +64,22 @@ try {
     Lbl 'lblUnit' 'Unit' 16 16 100;                      Cmb 'cmbUnit' 120 13
     Lbl 'lblDecimals' 'Decimals' 16 46 100;              Cmb 'cmbDecimals' 120 43
     Lbl 'lblPosition' 'Position' 16 76 100;              Cmb 'cmbPosition' 120 73
-    Lbl 'lblFontSize' 'Font Size (pt)' 16 106 100;       Txt 'txtFontSize' 120 106 160
-    Lbl 'lblTextWidthPercent' 'Text Width %' 16 136 100; Txt 'txtTextWidthPercent' 120 136 160
-    Lbl 'lblGap' 'Gap (mm)' 16 166 100;                  Txt 'txtGap' 120 166 160
-    Lbl 'lblPadding' 'Padding (mm)' 16 196 100;          Txt 'txtPadding' 120 196 160
-    Lbl 'lblCornerRadius' 'Corner Radius (mm)' 16 226 130; Txt 'txtCornerRadius' 150 226 130
-    Chk 'chkShowWidth' 'Show Width' 16 261 130 $true
-    Chk 'chkShowHeight' 'Show Height' 16 283 130 $true
-    Chk 'chkShowArea' 'Show Area' 16 305 130 $false
-    Chk 'chkShowPerimeter' 'Show Perimeter' 16 327 130 $false
-    Chk 'chkShowObjectCount' 'Show Object Count' 150 261 150 $false
-    Chk 'chkBackgroundBox' 'Background Box' 150 283 150 $true
-    Chk 'chkRoundedBackground' 'Rounded Background' 150 305 150 $false
-    Chk 'chkCreateLayer' 'Create Layer' 150 327 150 $true
-    Chk 'chkRememberSettings' 'Remember Settings' 16 351 200 $true
-    Lbl 'lblTemplate' 'Template' 16 381 100;             Txt 'txtTemplate' 120 381 160
-    Btn 'cmdOK' 'OK' 60 416
-    Btn 'cmdCancel' 'Cancel' 160 416
+    Lbl 'lblTextWidthPercent' 'Text Width %' 16 106 100; Txt 'txtTextWidthPercent' 120 106 160
+    Lbl 'lblGap' 'Gap (mm)' 16 136 100;                  Txt 'txtGap' 120 136 160
+    Lbl 'lblPadding' 'Padding (mm)' 16 166 100;          Txt 'txtPadding' 120 166 160
+    Lbl 'lblCornerRadius' 'Corner Radius (mm)' 16 196 130; Txt 'txtCornerRadius' 150 196 130
+    Chk 'chkShowWidth' 'Show Width' 16 231 130 $true
+    Chk 'chkShowHeight' 'Show Height' 16 253 130 $true
+    Chk 'chkShowArea' 'Show Area' 16 275 130 $false
+    Chk 'chkShowPerimeter' 'Show Perimeter' 16 297 130 $false
+    Chk 'chkShowObjectCount' 'Show Object Count' 150 231 150 $false
+    Chk 'chkBackgroundBox' 'Background Box' 150 253 150 $true
+    Chk 'chkRoundedBackground' 'Rounded Background' 150 275 150 $false
+    Chk 'chkCreateLayer' 'Create Layer' 150 297 150 $true
+    Chk 'chkRememberSettings' 'Remember Settings' 16 321 200 $true
+    Lbl 'lblTemplate' 'Template' 16 351 100;             Txt 'txtTemplate' 120 351 160
+    Btn 'cmdOK' 'OK' 60 386
+    Btn 'cmdCancel' 'Cancel' 160 386
     Write-Host ('controls added: ' + $d.Controls.Count)
 
     # Size the form to contain every control. Note: the form property setters take
@@ -183,7 +182,12 @@ End Sub
     }
     Write-Host 'form build done. CorelDRAW will persist it to the .gms on exit.'
 }
-catch { Write-Host ('ERROR: ' + $_.Exception.Message) }
+catch {
+    Write-Host ('ERROR: ' + $_.Exception.Message)
+    Write-Host 'NOTE: removing an existing form and adding a new one in the SAME session can fail'
+    Write-Host '      with a path/file access error. If that happens, re-run this script: the old'
+    Write-Host '      form is already gone, so the plain rebuild (add) then succeeds.'
+}
 finally {
     if ($app) { try { $app.Quit() } catch {} }
     Write-Host 'done.'

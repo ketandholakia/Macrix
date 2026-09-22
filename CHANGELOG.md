@@ -22,6 +22,24 @@ CHANGELOG entry here, not just internal refactors (§43).
   CI files to LF.
 - **`docs/WORKFLOW.md`** — the end-to-end macro development loop.
 
+### Changed — dimension-tools: Font Size dropped, Text Width % now works
+- **Removed the Font Size setting and control.** Labels are sized solely by
+  `Text Width %` — a percentage of the selected object's width. `VDT_Settings.fontSize`,
+  the `txtFontSize`/`lblFontSize` controls, and the persist/apply/read paths are gone.
+- **Root cause of "neither works":** the code set `Text.Story.FontSize`, `.FontName` and
+  `.TextRange.FontSize`. None of those members exist — a TextRange exposes `Font` and
+  `Size` — and `On Error Resume Next` swallowed the failure, so nothing happened at all.
+  Verified empirically against CorelDRAW 2021: setting `Story.Size` changes the shape's
+  width exactly as expected, while `Text.FontProperties.Size` is not settable.
+- `AppliedTextFormatting` now uses `Story.Font` / `Story.Size`; `ScaleTextToWidth` computes
+  `newSize = currentSize * (targetMM / currentWidthMM)` from `Shape.SizeWidth` (the
+  document unit is already millimetres during label creation), clamped to 0.5–2000 pt,
+  and aborts with a logged error instead of silently doing nothing.
+- Form rebuilt without the Font Size row (**27 controls**, 330×456 pt) and re-exported;
+  a stray `UserForm1` left by a failed form build was removed.
+- `Build-Form.ps1`: documents that removing and re-adding a form in one session can fail
+  with a path/file access error (re-run succeeds then).
+
 ### Changed — dimension-tools label placement
 - **New `Center` position**: `Label_PositionShape` now has a `center` case that puts the
   label at the object's centre, and the form's Position list is
