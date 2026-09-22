@@ -54,7 +54,7 @@ Public Function CreateDimensionLabel(doc As Document, x As Double, y As Double, 
     Dim boxShape As shape
     Dim finalShape As shape
     If doc Is Nothing Then Exit Function
-    Set textShape = CreateArtisticTextShape(doc, x, y, text, CDbl(settings.fontSize), objectWidthMM, settings)
+    Set textShape = CreateArtisticTextShape(doc, x, y, text, CDbl(settings.fontSize), settings, objectWidthMM)
     If textShape Is Nothing Then Exit Function
     
     Set finalShape = textShape
@@ -92,7 +92,7 @@ Public Sub Label_PositionShape(labelShape As shape, bounds As VDT_Bounds, positi
     MoveShapeToPoint labelShape, targetX, targetY
 End Sub
 
-Public Function CreateArtisticTextShape(doc As Document, x As Double, y As Double, text As String, ByVal fontSize As Double, Optional objectWidthMM As Double = 0, Optional settings As VDT_Settings) As shape
+Public Function CreateArtisticTextShape(doc As Document, x As Double, y As Double, text As String, ByVal fontSize As Double, settings As VDT_Settings, Optional objectWidthMM As Double = 0) As shape
     On Error Resume Next
     Dim targetLayer As Layer
     Set targetLayer = ActiveTargetLayer(doc)

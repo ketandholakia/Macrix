@@ -44,6 +44,17 @@ CHANGELOG entry here, not just internal refactors (§43).
   `UserForm1`. The form is now **330x486 pt** with `Caption = "Vittix Dimension"`. The form
   property setters take **string** values (an Int32 is rejected), and `Width`/`Height` are
   outer (points) while control `Left`/`Top` are inner coordinates.
+- Follow-up (reported as "Compile error: Invalid optional parameter type" after pressing OK):
+  `modLabel.CreateArtisticTextShape` declared `Optional settings As VDT_Settings`, and
+  **VBA forbids a user-defined Type as an `Optional` parameter**. Reordered to
+  `settings As VDT_Settings, Optional objectWidthMM As Double = 0` (a required parameter
+  may not follow an optional one) and updated its single caller.
+- `build/validate.ps1` gained a lint rule (6b) for exactly this: an `Optional` parameter
+  typed as a user-defined Type. Verified against a synthetic bad module.
+- **Duplicate-component bug in `deploy.ps1`**: the push loop captured a COM object across
+  the `VBComponents` enumerator, which could go invalid, so `Remove` silently failed and
+  VBE appended `1`/`2` (creating `modMain1`, `modUnits1`, `modUtils1`). The loop now removes
+  by index and also clears any suffixed duplicates. Verified: 11 components, 0 duplicates.
 
 ### Added — binary .gms build (dimension-tools)
 - **`build/deploy.ps1 -OutDir <dir>`** copies the rebuilt `.gms` out as a build

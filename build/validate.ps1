@@ -11,6 +11,8 @@
 *   4. Duplicate public procedure detection within a module.
 *   5. Public-proc naming (should start uppercase; namespace prefixes recognized).
 *   6. Leading-underscore identifiers -- invalid VBA, a historical project bug.
+*   6b. Optional parameter typed as a user-defined Type -- invalid VBA
+*       ("Invalid optional parameter type").
 *   7. Hard-coded absolute Windows paths.
 *   8. Feature registry drift:
 *        - every src\feat_*.bas is registered in modFeatureRegistry, and
@@ -88,6 +90,17 @@ $files = foreach ($d in $scanDirs) {
 }
 if (-not $files) { AddWarn "No .bas/.cls/.frm found; nothing to validate." }
 
+# Collect user-defined Type names (used by the Optional-parameter rule below).
+$udtNames = @{}
+foreach ($f in @($files)) {
+    $ft = Get-Content -Raw -LiteralPath $f.FullName
+    if ($ft) {
+        foreach ($m in [regex]::Matches($ft, '(?im)^\s*(?:Public\s+|Private\s+)?Type\s+([A-Za-z][A-Za-z0-9_]*)')) {
+            $udtNames[$m.Groups[1].Value] = $true
+        }
+    }
+}
+
 foreach ($file in $files) {
     $name = $file.Name
     $text = Get-Content -Raw -LiteralPath $file.FullName
@@ -122,6 +135,15 @@ foreach ($file in $files) {
         # 6. leading-underscore identifier (uncompilable in VBA)
         if ($t -match '^\s*(Public\s+|Private\s+|Friend\s+)?(Sub|Function|Property\s+(Get|Let|Set))\s+(_[A-Za-z0-9_]*)') {
             AddError "$name :: identifier starting with '_' is not valid VBA ($t)".Trim()
+        }
+
+        # 6b. VBA forbids an Optional parameter whose type is a user-defined Type
+        # ("Invalid optional parameter type"). This bit the dimension macro once.
+        if ($t -match '(?i)\bOptional\s+[A-Za-z][A-Za-z0-9_]*\s+As\s+([A-Za-z][A-Za-z0-9_]*)') {
+            $optType = $Matches[1]
+            if ($udtNames.ContainsKey($optType)) {
+                AddError "$name :: 'Optional' parameter cannot be a user-defined type ('$optType')"
+            }
         }
 
         # 4/5. public Sub/Function

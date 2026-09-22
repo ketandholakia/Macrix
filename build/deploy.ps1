@@ -289,9 +289,17 @@ Write-Host "applying ..."
 $ok = 0; $fail = 0
 foreach ($m in $modules) {
     try {
-        $comp = $null
-        foreach ($c in $proj.VBComponents) { if ($c.Name -ieq $m.BaseName) { $comp = $c; break } }
-        if ($comp) { $proj.VBComponents.Remove($comp) }
+        # Remove every component whose name matches the module, or which is a suffixed
+        # duplicate of it (VBE appends 1,2,... instead of replacing). Use index-based
+        # access: a COM object captured across an enumerator can go invalid, which made
+        # Remove silently fail and produced duplicate components.
+        $dupeRx = '^' + [regex]::Escape($m.BaseName) + '[0-9]+$'
+        for ($i = $proj.VBComponents.Count; $i -ge 1; $i--) {
+            $cn = $proj.VBComponents.Item($i).Name
+            if ($cn -ieq $m.BaseName -or $cn -match $dupeRx) {
+                $proj.VBComponents.Remove($proj.VBComponents.Item($i))
+            }
+        }
         [void]$proj.VBComponents.Import($m.FullName)
         $ok++
         Write-Host ("  OK   " + $m.BaseName)
