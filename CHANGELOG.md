@@ -6,6 +6,17 @@ CHANGELOG entry here, not just internal refactors (§43).
 
 ## [Unreleased]
 
+### Fixed — macrixImposition runtime error 424
+- `ShowImpositionForm` died with **"Run-time error '424': Object required"**. The runtime
+  form builder did `Set newFormComp = vbProj.VBComponents.Add(3)` and then, unguarded,
+  `newFormComp.Name = FORM_NAME` — when `Add` returns Nothing, that next line raises 424.
+- The dialog is now a **real design-time form**. `macros/macrixImposition/scripts/Build-Form.ps1`
+  builds `frmImpositionSettings` (26 controls + the 190-line code-behind, **extracted from
+  `mdlFormBuilder.bas`** so the two stay in step) and `ShowImpositionForm` now just calls
+  `frmImpositionSettings.Show`. No runtime VBE access, no form generation.
+- `BuildImpositionFormWithCode` still exists but now guards the `Add` and reports clearly
+  instead of raising 424.
+
 ### Added — macrixImposition built
 - **Fixed the compile blockers:** `modImposition.bas`, `modSettings.bas` and
   `ImpositionMacro.bas` had **no `Attribute VB_Name`**, and `mdlDebug.bas` declared

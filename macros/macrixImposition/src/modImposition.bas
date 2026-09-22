@@ -25,13 +25,10 @@ Option Explicit
 
 Public Sub ShowImpositionForm()
     InitDefaultSettings
-    ' The form is generated at runtime by mdlFormBuilder (CorelDRAW's
-    ' VBE cannot load VB6-format .frm files). Build it if missing, then
-    ' show it late-bound so this module has no compile-time dependency.
-    If Not ImpositionFormExists() Then
-        BuildImpositionFormWithCode
-    End If
-    VBA.UserForms.Add("frmImpositionSettings").Show
+    ' frmImpositionSettings is a real design-time form in this project (built by
+    ' scripts\Build-Form.ps1 and exported to forms\frmImpositionSettings.frm), so it is
+    ' shown directly: no runtime form generation and no VBE access required.
+    frmImpositionSettings.Show
 End Sub
 
 Private Sub RunImposition()

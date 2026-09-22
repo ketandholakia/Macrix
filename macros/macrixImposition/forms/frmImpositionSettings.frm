@@ -1,232 +1,20 @@
 VERSION 5.00
-Begin VB.Form frmImpositionSettings 
+Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmImpositionSettings 
    Caption         =   "Imposition Settings"
-   ClientHeight    =   6180
-   ClientLeft      =   120
-   ClientTop       =   465
-   ClientWidth     =   4560
-   LinkTopic       =   "Form1"
-   ScaleHeight     =   6180
-   ScaleWidth      =   4560
-   StartUpPosition =   3  'Windows Default
-   Begin VB.CommandButton cmdCancel 
-      Caption         =   "Cancel"
-      Height          =   375
-      Left            =   2520
-      TabIndex        =   17
-      Top             =   5680
-      Width           =   1215
-   End
-   Begin VB.CommandButton cmdRun 
-      Caption         =   "Run Imposition"
-      Default         =   -1  'True
-      Height          =   375
-      Left            =   960
-      TabIndex        =   16
-      Top             =   5680
-      Width           =   1455
-   End
-   Begin VB.TextBox txtStepRepeatSheetCount 
-      Height          =   285
-      Left            =   2520
-      TabIndex        =   15
-      Top             =   5240
-      Width           =   1215
-   End
-   Begin VB.Label lblStepRepeatSheetCount 
-      Caption         =   "Sheets to produce"
-      Height          =   255
-      Left            =   240
-      TabIndex        =   14
-      Top             =   5280
-      Width           =   2175
-   End
-   Begin VB.TextBox txtStepRepeatPage 
-      Height          =   285
-      Left            =   2520
-      TabIndex        =   13
-      Top             =   4880
-      Width           =   1215
-   End
-   Begin VB.Label lblStepRepeatPage 
-      Caption         =   "Repeat which page #"
-      Height          =   255
-      Left            =   240
-      TabIndex        =   12
-      Top             =   4920
-      Width           =   2175
-   End
-   Begin VB.CheckBox chkCropMarks 
-      Caption         =   "Add crop marks"
-      Height          =   255
-      Left            =   240
-      TabIndex        =   11
-      Top             =   4480
-      Value           =   1  'Checked
-      Width           =   2175
-   End
-   Begin VB.TextBox txtCropMarkLength 
-      Height          =   285
-      Left            =   2520
-      TabIndex        =   10
-      Top             =   4440
-      Width           =   1215
-   End
-   Begin VB.TextBox txtBleedSize 
-      Height          =   285
-      Left            =   2520
-      TabIndex        =   9
-      Top             =   4040
-      Width           =   1215
-   End
-   Begin VB.Label lblBleedSize 
-      Caption         =   "Bleed size"
-      Height          =   255
-      Left            =   240
-      TabIndex        =   8
-      Top             =   4080
-      Width           =   2175
-   End
-   Begin VB.TextBox txtMarginTop 
-      Height          =   285
-      Left            =   2520
-      TabIndex        =   7
-      Top             =   3640
-      Width           =   1215
-   End
-   Begin VB.TextBox txtMarginLeft 
-      Height          =   285
-      Left            =   960
-      TabIndex        =   6
-      Top             =   3640
-      Width           =   1215
-   End
-   Begin VB.Label lblMargins 
-      Caption         =   "Margin L / T"
-      Height          =   255
-      Left            =   240
-      TabIndex        =   5
-      Top             =   3320
-      Width           =   2175
-   End
-   Begin VB.TextBox txtGutterY 
-      Height          =   285
-      Left            =   2520
-      TabIndex        =   4
-      Top             =   3000
-      Width           =   1215
-   End
-   Begin VB.TextBox txtGutterX 
-      Height          =   285
-      Left            =   960
-      TabIndex        =   3
-      Top             =   3000
-      Width           =   1215
-   End
-   Begin VB.Label lblGutters 
-      Caption         =   "Gutter X / Y"
-      Height          =   255
-      Left            =   240
-      TabIndex        =   2
-      Top             =   2680
-      Width           =   2175
-   End
-   Begin VB.TextBox txtGridCols 
-      Height          =   285
-      Left            =   2520
-      TabIndex        =   1
-      Top             =   2360
-      Width           =   1215
-   End
-   Begin VB.TextBox txtGridRows 
-      Height          =   285
-      Left            =   960
-      TabIndex        =   0
-      Top             =   2360
-      Width           =   1215
-   End
-   Begin VB.Label lblGrid 
-      Caption         =   "Grid Rows / Cols"
-      Height          =   255
-      Left            =   240
-      TabIndex        =   18
-      Top             =   2040
-      Width           =   2175
-   End
-   Begin VB.TextBox txtSheetHeight 
-      Height          =   285
-      Left            =   2520
-      TabIndex        =   19
-      Top             =   1720
-      Width           =   1215
-   End
-   Begin VB.TextBox txtSheetWidth 
-      Height          =   285
-      Left            =   960
-      TabIndex        =   20
-      Top             =   1720
-      Width           =   1215
-   End
-   Begin VB.Label lblSheetSize 
-      Caption         =   "Sheet Width / Height"
-      Height          =   255
-      Left            =   240
-      TabIndex        =   21
-      Top             =   1400
-      Width           =   2295
-   End
-   Begin VB.ComboBox cboUnit 
-      Height          =   315
-      Left            =   2520
-      Style           =   2  'Dropdown List
-      TabIndex        =   22
-      Top             =   1000
-      Width           =   1815
-   End
-   Begin VB.Label lblUnit 
-      Caption         =   "Unit"
-      Height          =   255
-      Left            =   240
-      TabIndex        =   23
-      Top             =   1040
-      Width           =   2175
-   End
-   Begin VB.ComboBox cboLayoutMode 
-      Height          =   315
-      Left            =   2520
-      Style           =   2  'Dropdown List
-      TabIndex        =   24
-      Top             =   560
-      Width           =   1815
-   End
-   Begin VB.Label lblLayoutMode 
-      Caption         =   "Layout Mode"
-      Height          =   255
-      Left            =   240
-      TabIndex        =   25
-      Top             =   600
-      Width           =   2175
-   End
+   ClientHeight    =   8610.001
+   ClientLeft      =   45
+   ClientTop       =   390
+   ClientWidth     =   6105
+   OleObjectBlob   =   "frmImpositionSettings.frx":0000
+   StartUpPosition =   1  'CenterOwner
 End
 Attribute VB_Name = "frmImpositionSettings"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-'==============================================================
-' frmImpositionSettings
-' Simple settings UI over modSettings' g_ variables. On "Run
-' Imposition" it validates input, writes it back to the g_
-' variables, and calls modImposition.RunImposition.
-'==============================================================
-
-Option Explicit
 
 Private Sub UserForm_Initialize()
-    ' Not used for VB.Form (CorelDRAW VBA); Form_Load below does the work.
-End Sub
-
-Private Sub Form_Load()
 
     If Not g_SettingsInitialized Then InitDefaultSettings
 
@@ -235,9 +23,6 @@ Private Sub Form_Load()
     cboLayoutMode.AddItem "Signature"
     cboLayoutMode.ListIndex = IndexOfString(cboLayoutMode, g_LayoutMode)
 
-    ' NOTE: enum member names (cdrMillimeter, cdrInch, etc.) can differ
-    ' slightly by CorelDRAW version. If any of these four don't compile,
-    ' check the exact names via the VBA Object Browser (F2, search "cdrUnit").
     cboUnit.AddItem "Millimeters"
     cboUnit.AddItem "Inches"
     cboUnit.AddItem "Points"
@@ -270,7 +55,7 @@ End Sub
 ' out otherwise so the form doesn't look like it needs values it won't use.
 Private Sub RefreshStepRepeatVisibility()
     Dim isStepRepeat As Boolean
-    isStepRepeat = (cboLayoutMode.Text = "StepRepeat")
+    isStepRepeat = (cboLayoutMode.Value = "StepRepeat")
     txtStepRepeatPage.Enabled = isStepRepeat
     txtStepRepeatSheetCount.Enabled = isStepRepeat
     lblStepRepeatPage.Enabled = isStepRepeat
@@ -285,7 +70,7 @@ Private Sub cmdRun_Click()
 
     If Not ValidateInputs() Then Exit Sub
 
-    g_LayoutMode = cboLayoutMode.Text
+    g_LayoutMode = cboLayoutMode.Value
     g_Unit = ComboIndexToUnit(cboUnit.ListIndex)
 
     g_SheetWidth = CDbl(txtSheetWidth.Text)
@@ -297,7 +82,7 @@ Private Sub cmdRun_Click()
     g_MarginLeft = CDbl(txtMarginLeft.Text)
     g_MarginTop = CDbl(txtMarginTop.Text)
     g_BleedSize = CDbl(txtBleedSize.Text)
-    g_AddCropMarks = (chkCropMarks.Value = 1)
+    g_AddCropMarks = (chkCropMarks.Value)
     g_CropMarkLength = CDbl(txtCropMarkLength.Text)
     g_StepRepeatPage = CInt(NzNum(txtStepRepeatPage.Text, 1))
     g_StepRepeatSheetCount = CInt(NzNum(txtStepRepeatSheetCount.Text, 1))
@@ -346,7 +131,7 @@ Private Function ValidateInputs() As Boolean
         MsgBox "Crop mark length must be 0 or more.", vbExclamation
         Exit Function
     End If
-    If cboLayoutMode.Text = "StepRepeat" Then
+    If cboLayoutMode.Value = "StepRepeat" Then
         If Not IsPositiveWholeNumber(txtStepRepeatPage.Text) Then
             MsgBox "Step & Repeat page number must be a whole number of 1 or more.", vbExclamation
             Exit Function
@@ -356,7 +141,7 @@ Private Function ValidateInputs() As Boolean
             Exit Function
         End If
     End If
-    If cboLayoutMode.Text = "Signature" Then
+    If cboLayoutMode.Value = "Signature" Then
         If CInt(txtGridRows.Text) <> 1 Or CInt(txtGridCols.Text) <> 2 Then
             MsgBox "Signature mode currently requires Grid Rows = 1 and Grid Cols = 2.", vbExclamation
             Exit Function
@@ -387,7 +172,7 @@ Private Function NzNum(s As String, defaultVal As Double) As Double
     End If
 End Function
 
-Private Function IndexOfString(cbo As ComboBox, s As String) As Integer
+Private Function IndexOfString(cbo As Object, s As String) As Integer
     Dim i As Integer
     For i = 0 To cbo.ListCount - 1
         If cbo.List(i) = s Then
@@ -417,3 +202,4 @@ Private Function ComboIndexToUnit(idx As Integer) As cdrUnit
         Case Else: ComboIndexToUnit = cdrMillimeter
     End Select
 End Function
+

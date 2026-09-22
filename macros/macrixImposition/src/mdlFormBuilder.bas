@@ -42,6 +42,13 @@ Public Sub BuildImpositionFormWithCode()
     ' 2. Add the UserForm component (3 = MSForm)
     Dim newFormComp As Object
     Set newFormComp = vbProj.VBComponents.Add(3)
+    ' Guarded: VBComponents.Add can return Nothing, and the next line would then raise
+    ' "Run-time error 424: Object required" with no clue as to why.
+    If newFormComp Is Nothing Then
+        MsgBox "Could not create the UserForm component (project may be read-only or locked).", _
+               vbCritical, "Imposition"
+        Exit Sub
+    End If
     newFormComp.Name = FORM_NAME
 
     ' 3. Configure the form itself
