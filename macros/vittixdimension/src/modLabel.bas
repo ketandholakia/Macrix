@@ -176,8 +176,14 @@ Private Sub ApplyTextColor(sh As shape, ByVal colorText As String)
     Dim c As Long
     Dim r As Long, g As Long, b As Long
     If sh Is Nothing Then Exit Sub
+    ' Blank means "leave the default colour"; anything else must parse or we say so
+    ' rather than failing silently.
+    If Len(Trim$(colorText)) = 0 Then Exit Sub
     c = ColorFromHex(colorText)
-    If c < 0 Then Exit Sub
+    If c < 0 Then
+        LogError "ApplyTextColor", 0, "Unrecognised caption colour '" & colorText & "' (use #RRGGBB or R,G,B)."
+        Exit Sub
+    End If
     r = c And &HFF
     g = (c \ &H100) And &HFF
     b = (c \ &H10000) And &HFF

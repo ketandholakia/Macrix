@@ -67,15 +67,19 @@ Public Function ColorFromHex(ByVal value As String) As Long
     On Error GoTo Bad
     Dim s As String
     Dim parts() As String
-    ColorFromHex = -1
+    Dim rr As Long, gg As Long, bb As Long
 
+    ColorFromHex = -1
     s = SafeTrim(value)
     If Len(s) = 0 Then Exit Function
 
     If InStr(s, ",") > 0 Then
         parts = Split(s, ",")
         If UBound(parts) <> 2 Then Exit Function
-        ColorFromHex = RGB(CInt(SafeTrim(parts(0))), CInt(SafeTrim(parts(1))), CInt(SafeTrim(parts(2))))
+        rr = CLng(SafeTrim(parts(0)))
+        gg = CLng(SafeTrim(parts(1)))
+        bb = CLng(SafeTrim(parts(2)))
+        ColorFromHex = RGB(rr, gg, bb)
         Exit Function
     End If
 
@@ -85,10 +89,39 @@ Public Function ColorFromHex(ByVal value As String) As Long
         s = Mid$(s, 1, 1) & Mid$(s, 1, 1) & Mid$(s, 2, 1) & Mid$(s, 2, 1) & Mid$(s, 3, 1) & Mid$(s, 3, 1)
     End If
     If Len(s) <> 6 Then Exit Function
-    ColorFromHex = RGB(CLng("&H" & Mid$(s, 1, 2) & "&"), CLng("&H" & Mid$(s, 3, 2) & "&"), CLng("&H" & Mid$(s, 5, 2) & "&"))
+
+    rr = HexPair(s, 1)
+    gg = HexPair(s, 3)
+    bb = HexPair(s, 5)
+    If rr < 0 Or gg < 0 Or bb < 0 Then Exit Function
+    ColorFromHex = RGB(rr, gg, bb)
     Exit Function
 Bad:
     ColorFromHex = -1
+End Function
+
+' Two hex digits -> 0..255, or -1 when either character is not hex. Deliberately avoids
+' CLng's hex-string parsing: CLng("&HFF&") raises an error, which On Error turned into
+' "-1" and silently disabled the caption colour altogether.
+Private Function HexPair(ByVal s As String, ByVal startIndex As Long) As Long
+    Dim hi As Long, lo As Long
+    hi = HexDigit(Mid$(s, startIndex, 1))
+    lo = HexDigit(Mid$(s, startIndex + 1, 1))
+    If hi < 0 Or lo < 0 Then
+        HexPair = -1
+    Else
+        HexPair = hi * 16 + lo
+    End If
+End Function
+Private Function HexDigit(ByVal ch As String) As Long
+    Dim i As Long
+    HexDigit = -1
+    For i = 1 To Len("0123456789ABCDEF")
+        If UCase$(ch) = Mid$("0123456789ABCDEF", i, 1) Then
+            HexDigit = i - 1
+            Exit Function
+        End If
+    Next i
 End Function
 
 ' RGB Long -> "#RRGGBB" (for showing a stored colour in a text box).
