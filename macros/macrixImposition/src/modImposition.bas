@@ -85,7 +85,9 @@ Public Sub RunImposition()
         If sheetIndex = 1 Then
             Set outPage = outDoc.Pages(1)
         Else
-            Set outPage = outDoc.Pages.Add(outDoc.Pages.Count)
+            ' AddPages, not Pages.Add: the Pages collection has no Add method (error 438).
+            outDoc.AddPages 1
+            Set outPage = outDoc.Pages(outDoc.Pages.Count)
         End If
         outPage.SetSize g_SheetWidth, g_SheetHeight
 
@@ -240,10 +242,13 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
     Set srcShapes = srcPage.Shapes.All
     srcShapes.Copy
 
-    ' Switch to output doc, paste onto the target page
+    ' Switch to output doc, paste onto the target page.
+    ' NOTE: Paste lives on Layer (and on Page.ActiveLayer) -- NOT on Document, so
+    ' outDoc.Paste raises "Run-time error 438: Object doesn't support this property
+    ' or method".
     outDoc.Activate
     outPage.Activate
-    Set dupShapes = outDoc.Paste
+    Set dupShapes = outPage.ActiveLayer.Paste
 
     ' Position: align pasted content's top-left to the cell's top-left.
     ' (Assumes outDoc.ReferencePoint = cdrTopLeft, set in RunImposition.)
