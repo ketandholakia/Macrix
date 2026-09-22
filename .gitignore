@@ -19,3 +19,5 @@ Desktop.ini
 # ---- Agent workspace / runtime (not project source) ----
 /.agents/
 /.openclaw/
+# ---- Inbound chat attachments (not project source) ----
+/.openclaw-attachments/
