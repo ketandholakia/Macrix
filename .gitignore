@@ -1,0 +1,21 @@
+# ---- Generated / runtime artifacts ----
+/build/_out/
+/build/staging/
+*.gms
+*.gcm
+*.tlb
+
+# ---- Local diagnostics ----
+/logs/
+*.log
+
+# ---- OS / editor noise ----
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/
+.DS_Store
+
+# ---- Agent workspace / runtime (not project source) ----
+/.agents/
+/.openclaw/

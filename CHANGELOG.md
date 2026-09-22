@@ -1,0 +1,74 @@
+# Changelog
+
+This project uses [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PATCH`) for the platform
+and per-feature where features version independently. Every user-visible behavior change requires a
+CHANGELOG entry here, not just internal refactors (§43).
+
+## [Unreleased]
+
+### Added — developer tooling & CI
+- **`build/new-feature.ps1`** — scaffolds a new feature module from
+  `build/templates/feat_template.bas` (safe-run skeleton pre-wired), reserves an
+  unused `Err.Raise` base, and with `-Register` inserts the `FR_Register` line
+  into `modFeatureRegistry.FR_RegisterFeatures()` automatically. Prints the
+  characterization-test row and CHANGELOG stub to add.
+- **`build/validate.ps1`** — added checks: `Attribute VB_Name` present and
+  matching the file; balanced `Sub`/`Function`/`Property` blocks;
+  leading-underscore identifiers (uncompilable — the historical bug); and
+  **feature-registry drift** (every `src\feat_*.bas` is registered, and every
+  registered module exists).
+- **`.github/workflows/validate.yml`** — CI runs `build/validate.ps1` on push/PR.
+- **`.gitattributes`** — pins VBA sources (`.bas`/`.cls`/`.frm`) to CRLF; docs and
+  CI files to LF.
+- **`docs/WORKFLOW.md`** — the end-to-end macro development loop.
+
+### Fixed
+- **Project failed to compile at all** — every private helper across the codebase (`modLogger`,
+  `modVersion`, `modErrorHandler`, `modFeatureRegistry`, `feat_RoundedCorners`, `feat_ExportText`) was
+  named with a leading underscore (`_openFile`, `_Split`, `_getCount`, `_setCount`, `_isDisabled`,
+  `_disable`, `_index`, `_SelectionRound`, `_WriteDocument`) per the (incorrect) convention in
+  `CONVENTIONS.md`. VBA identifiers must start with a letter, so every one of these declarations —
+  and every call site — was a syntax error. Since VBA compiles the whole project as a unit, this blocked
+  *every* macro, including unrelated ones like `modTestRunner.RunAll`. Renamed all of them to a `p_`
+  prefix and fixed `CONVENTIONS.md`/`ADDING_A_MACRO.md` so the mistake isn't reintroduced.
+- `feat_ExportText.Main` called `modExportImportServices.SVE_BuildExportPath` and
+  `_WriteDocumentText`, neither of which existed (`modExportImportServices` was never built; the real
+  private sub was named `_WriteDocument`, and did nothing but write a hardcoded placeholder line,
+  ignoring the document entirely). Added `modExportImportServices` (`SVE_BuildExportPath`) and
+  rewrote the write path (now `p_WriteDocumentText`) to actually enumerate shapes across all pages
+  and export each text shape's `Text.Story`, with real file-IO failures propagating to the caller
+  instead of being swallowed.
+- `docs/TESTING.md` claimed the runner "calls each `test_*` procedure". VBA has no
+  reflection, so no such auto-discovery exists; the assertions are listed
+  explicitly in `modTestRunner.RunAll`. Corrected the doc to match reality.
+- `modFeatureRegistry.FR_RegisterFeatures` was not idempotent — calling it more than once per session
+  (e.g. re-running `modBootstrap.Main` while testing) duplicated every registered feature. It now
+  resets its table before re-registering.
+- `modVersionDetect.VD_ParseCorelVersion` stripped all non-digit characters and concatenated what was
+  left into one number (`"2021.0.0"` → 202100, `"18.0.0.448"` → 1800448), so version ordering only
+  held by coincidence of digit-string length. It now splits on `.` and weights each segment
+  independently, matching `modVersion.VER_Compare`'s semantics instead of a separate, less reliable
+  scheme.
+- Added regression tests to `modTestRunner.RunAll` for the version-parsing and registry-idempotency
+  fixes above, so they can't silently regress again.
+
+### Added — greenfield bootstrap
+- Scaffolded platform per the target architecture: Core Framework, Infrastructure, UI, Compatibility,
+  Security, Development/Build tooling.
+- Foundation modules:
+  - Feature registry (`modFeatureRegistry`) with registration, availability gating, and session
+    circuit breaker.
+  - Safe-run pattern (inlined per feature — see `docs/CONVENTIONS.md`) for uniform error handling and
+    state restoration on every exit path.
+  - Pure-logic test harness (`modTestRunner`) + `pl_*` modules.
+  - Static validation entry point (`build/validate.ps1`).
+- Placeholder UserForm `frmAbout.frm`.
+
+### Deprecation policy
+- No features shipped yet; once the first real feature lands, this section documents the
+  deprecate → warn → remove timeline (§43).
+
+## Format
+
+- `Added` / `Changed` / `Deprecated` / `Removed` / `Fixed` / `Security`.
+- Reference feature IDs from the registry and commit messages (`feat(plate):`, `fix(module):`) per §47.

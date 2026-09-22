@@ -1,0 +1,22 @@
+# Normalize line endings on checkout/commit.
+* text=auto
+
+# VBA / VBE source must stay CRLF (the VBE importers expect it).
+*.bas  text eol=crlf
+*.cls  text eol=crlf
+*.frm  text eol=crlf
+*.frx  binary
+*.vba  text eol=crlf
+
+# Build / doc / CI text.
+*.ps1  text eol=crlf
+*.bat  text eol=crlf
+*.md   text eol=lf
+*.yml  text eol=lf
+*.json text eol=lf
+*.iss  text eol=crlf
+
+# Binary artifacts.
+*.gms  binary
+*.zip  binary
+*.exe  binary

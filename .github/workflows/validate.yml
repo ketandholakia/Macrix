@@ -1,0 +1,20 @@
+name: validate
+
+# Static checks only. CorelDRAW COM behavior cannot be exercised in CI on any
+# runner (the product and toolchain are Windows/CorelDRAW-only), so this gate is
+# deliberately limited to build/validate.ps1 per docs/TESTING.md (Tier 0).
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  static-checks:
+    # Windows runner: the target product is Windows-only, so validate here too.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Static validation
+        shell: pwsh
+        run: ./build/validate.ps1
