@@ -22,7 +22,27 @@ CHANGELOG entry here, not just internal refactors (§43).
   CI files to LF.
 - **`docs/WORKFLOW.md`** — the end-to-end macro development loop.
 
+### Added — deployment to CorelDRAW
+- **`build/deploy.ps1`** — imports the repo's VBA modules into a CorelDRAW `.gms`
+  project. Dry-run by default (`-Apply` to write); validates first; never quits a
+  CorelDRAW instance it did not start. `-List` enumerates loaded GMS projects and
+  their macros. Grounded in the CorelDRAW 2021 automation model, verified from the
+  installed type library: `Application` exposes `VBE`, `GMSManager`
+  (`Projects.Load/Unload`, `RunMacro`).
+- **`tools/dev-import/modDevImport.bas`** — in-app bootstrap importer: import it into
+  the project once, then run `DevImport_RunAll` inside CorelDRAW to pull every staged
+  module in. Deliberately outside the staged set so it never re-imports itself.
+- **`docs/DEPLOYMENT.md`** — the two deployment paths, prerequisites, saving semantics.
+- `build/validate.ps1` now also lints `tools/dev-import` (structural checks only).
+
 ### Fixed
+- **`new-feature.ps1` corrupted non-ASCII files.** It read source with PowerShell's
+  default encoding and rewrote UTF-8, so characters in a file it touched were
+  double-encoded. This mangled `modFeatureRegistry.bas`'s header (`—` → `â€“`,
+  `§` → `Â§`) during testing. Reads are now explicit UTF-8. Separately, non-ASCII
+  characters inside `.ps1` string literals broke parsing under Windows PowerShell
+  5.1; the build scripts are now ASCII-only, and the corrupted registry header was
+  restored. Both shells parse all four scripts cleanly.
 - **Project failed to compile at all** — every private helper across the codebase (`modLogger`,
   `modVersion`, `modErrorHandler`, `modFeatureRegistry`, `feat_RoundedCorners`, `feat_ExportText`) was
   named with a leading underscore (`_openFile`, `_Split`, `_getCount`, `_setCount`, `_isDisabled`,

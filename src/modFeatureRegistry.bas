@@ -1,12 +1,12 @@
 Attribute VB_Name = "modFeatureRegistry"
 Option Explicit
 ''
-' modFeatureRegistry â€” feature/module registration & gating (Â§12, Â§26, Â§43).
+' modFeatureRegistry — feature/module registration & gating (§12, §26, §43).
 '
 ' Central register of every feature. Features are added in FR_RegisterFeatures()
 ' (one line each) and discovered/listed here rather than through hard-coded menus.
-' The registry also drives availability gating, per-feature versioning (Â§43),
-' deprecation status, and the Â§46 circuit-breaker pre-check. Actual invocation is
+' The registry also drives availability gating, per-feature versioning (§43),
+' deprecation status, and the §46 circuit-breaker pre-check. Actual invocation is
 ' the feature module's own public entry point, which itself wraps the safe-run
 ' pattern; FR_EntryPoint returns which "Module.entry" the caller should invoke.
 ''
@@ -62,7 +62,7 @@ End Sub
 
 ' Register every shipped feature (single curated place per ADDING_A_MACRO).
 ' Idempotent: safe to call more than once in a session (modBootstrap.Main may
-' run again e.g. during manual testing) â€” resets the table first so repeated
+' run again e.g. during manual testing) — resets the table first so repeated
 ' calls never duplicate entries.
 Public Sub FR_RegisterFeatures()
     m_n = 0

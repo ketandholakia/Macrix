@@ -1,5 +1,5 @@
 <#
-  build/new-feature.ps1 — scaffold a new feature module that conforms to the
+  build/new-feature.ps1 -- scaffold a new feature module that conforms to the
   project conventions (safe-run pattern, registry entry, docs/test stubs).
 
   Usage:
@@ -52,7 +52,7 @@ if ((Test-Path $target) -and -not $Force) {
 # Reserve an Err.Raise base above anything already used by features.
 $maxErr = 0
 Get-ChildItem -Path $srcDir -File -Filter 'feat_*.bas' -ErrorAction SilentlyContinue | ForEach-Object {
-    $t = Get-Content -Raw -LiteralPath $_.FullName
+    $t = [System.IO.File]::ReadAllText($_.FullName, [System.Text.Encoding]::UTF8)
     foreach ($m in [regex]::Matches($t, 'Err\.Raise\s+(\d+)')) {
         $n = [int]$m.Groups[1].Value
         if ($n -gt $maxErr) { $maxErr = $n }
@@ -60,8 +60,8 @@ Get-ChildItem -Path $srcDir -File -Filter 'feat_*.bas' -ErrorAction SilentlyCont
 }
 $errBase = if ($maxErr -eq 0) { 1000 } else { ([math]::Floor($maxErr / 100) + 1) * 100 }
 
-# Emit the module (UTF-8 without BOM, CRLF — what VBE expects).
-$body = Get-Content -Raw -LiteralPath $tplPath
+# Emit the module (UTF-8 without BOM, CRLF -- what VBE expects).
+$body = [System.IO.File]::ReadAllText($tplPath, [System.Text.Encoding]::UTF8)
 $body = $body.Replace('@@MODULE@@', $module).
               Replace('@@FEATURE_ID@@', $Name).
               Replace('@@DISPLAY@@', $Display).
@@ -83,13 +83,17 @@ $regLine2 = '        fb_Available, ' + $fbStability + ', ' + $q + $Version + $q 
 $registered = $false
 if ($Register) {
     if (-not (Test-Path $regPath)) { throw "Registry file not found: $regPath" }
-    $regText = Get-Content -Raw -LiteralPath $regPath
+    $regText = [System.IO.File]::ReadAllText($regPath, [System.Text.Encoding]::UTF8)
     if ($regText -match [regex]::Escape($q + $module + $q)) {
         Write-Host "Already registered: $module is present in modFeatureRegistry (skipping insert)."
     }
     else {
+        $srcLines = $regText -split "`r?`n"
+        if ($srcLines.Count -gt 0 -and $srcLines[-1] -eq '') {
+            $srcLines = $srcLines[0..($srcLines.Count - 2)]
+        }
         $lines = [System.Collections.Generic.List[string]]::new()
-        (Get-Content -LiteralPath $regPath) | ForEach-Object { [void]$lines.Add($_) }
+        foreach ($ln in $srcLines) { [void]$lines.Add($ln) }
 
         $start = -1
         for ($i = 0; $i -lt $lines.Count; $i++) {

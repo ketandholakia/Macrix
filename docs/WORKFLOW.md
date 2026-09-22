@@ -49,11 +49,16 @@ every `src\feat_*.bas` is registered, and every registered module exists.
 ## 6. Package & deploy
 ```powershell
 powershell -File build/package.ps1        # versioned zip into build\_out
-build\sync_gms_modules.bat                # stage .bas/.frm into the GMS folder
+
+# push modules into the live CorelDRAW VBA project (.gms):
+powershell -File build/deploy.ps1 -List   # inspect loaded projects + macros
+powershell -File build/deploy.ps1         # dry run (validates + prints plan)
+powershell -File build/deploy.ps1 -Apply  # import into the target project
 ```
-Then import the staged modules into `Vittix.gms` in the VBE (File → Import File).
-CorelDRAW's `.gms` is a binary project, so source modules are staged for import,
-not auto-linked.
+CorelDRAW's `.gms` is a **binary** project, so source can't be linked directly — it
+must be imported (via `Application.VBE` from `deploy.ps1`, or via the in-app bootstrap
+`modDevImport.DevImport_RunAll`). Full mechanism, prerequisites, and the recommended
+bootstrap path: **`docs/DEPLOYMENT.md`**.
 
 ## 7. Release
 Follow `docs/RELEASE_CHECKLIST.md` (functional gate, safety/install, docs, review,

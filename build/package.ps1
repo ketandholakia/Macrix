@@ -1,4 +1,4 @@
-# package.ps1 — assemble a versioned source package + docs for the installer.
+# package.ps1 -- assemble a versioned source package + docs for the installer.
 # Requires Windows PowerShell. Produces build\_out\{version}\VittixCore.gms-all\ ...
 # Reads version from src\modVersion.bas (VER_CurrentVersion).
 param(

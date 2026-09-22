@@ -1,7 +1,7 @@
 <#
-* build/validate.ps1 — static lint / validation.
+* build/validate.ps1 -- static lint / validation.
 *
-* Runs in CI *without* CorelDRAW (PowerShell 5+ / pwsh on Windows). Per §41 this
+* Runs in CI *without* CorelDRAW (PowerShell 5+ / pwsh on Windows). Per sec.41 this
 * is the ONLY step that is automated in CI; COM behavior is manual characterization.
 *
 * Checks:
@@ -10,11 +10,13 @@
 *   3. Balanced procedure blocks (Sub/Function/Property vs End ...).
 *   4. Duplicate public procedure detection within a module.
 *   5. Public-proc naming (should start uppercase; namespace prefixes recognized).
-*   6. Leading-underscore identifiers — invalid VBA, a historical project bug.
+*   6. Leading-underscore identifiers -- invalid VBA, a historical project bug.
 *   7. Hard-coded absolute Windows paths.
 *   8. Feature registry drift:
 *        - every src\feat_*.bas is registered in modFeatureRegistry, and
 *        - every module named by an FR_Register call actually exists.
+*
+* Structural checks (1-7) also cover tools\dev-import; check 8 is src-only.
 *
 * Exit code 0 = OK, 1 = errors, 2 = warnings-only.
 #>
@@ -38,7 +40,15 @@ if (-not (Test-Path $SrcDir)) {
 
 Write-Host "Scanning $SrcDir ..."
 
-$files = Get-ChildItem -Path $SrcDir -Recurse -File -Include *.bas, *.cls, *.frm -ErrorAction SilentlyContinue
+# Structural checks run on src\ plus the dev-tooling folder; registry drift
+# (check 8) applies to src\ only.
+$scanDirs = @($SrcDir)
+$toolsDir = Join-Path (Split-Path $SrcDir -Parent) 'tools\dev-import'
+if (Test-Path $toolsDir) { $scanDirs += $toolsDir }
+
+$files = foreach ($d in $scanDirs) {
+    Get-ChildItem -Path $d -Recurse -File -Include *.bas, *.cls, *.frm -ErrorAction SilentlyContinue
+}
 if (-not $files) { AddWarn "No .bas/.cls/.frm found; nothing to validate." }
 
 foreach ($file in $files) {
