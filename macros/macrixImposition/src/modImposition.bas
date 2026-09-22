@@ -251,8 +251,20 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
 
     Set originalActiveDoc = Application.ActiveDocument
     Set srcPage = outDoc.Pages(srcPageIdx)
+    If srcPage.Shapes.Count = 0 Then Exit Sub
 
-    If srcPage.Shapes.Count = 0 Then Exit Sub ' nothing to place
+    ' Give the copy a page-sized, unfilled/unstroked frame. The objects alone carry no
+    ' page reference -- "Shapes.All" is just the artwork -- so the copy had no page extent
+    ' to align and the sizing was lost. The frame makes the copied range span the page.
+    On Error Resume Next
+    Dim frameShape As Shape
+    Set frameShape = srcPage.ActiveLayer.CreateRectangle(0, 0, srcPage.SizeWidth, srcPage.SizeHeight)
+    If Not frameShape Is Nothing Then
+        frameShape.Fill.ApplyNoFill
+        frameShape.Outline.Width = 0
+    End If
+    Err.Clear
+    On Error GoTo 0
 
     Set srcShapes = srcPage.Shapes.All
     If srcShapes Is Nothing Then Exit Sub
@@ -297,14 +309,14 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
         Exit Sub
     End If
 
-    ' Position: align the copied content's TOP-LEFT to the cell's top-left.
-    ' ShapeRange.SetPosition positions the range's CENTRE (and in practice left the
-    ' copies where they were, stacked in the middle of the sheet), so measure the current
-    ' top-left and move by the exact delta instead.
-    Dim dx As Double, dy As Double
-    dx = cellX - dupShapes.LeftX
-    dy = cellY - dupShapes.TopY
-    dupShapes.Move dx, dy
+    ' Position: the copied objects keep their PAGE coordinates, so shifting by exactly the
+    ' cell offset puts the source page's top-left on the cell's top-left. (Using the
+    ' objects' own LeftX as the delta only nudged them, which is why they stayed centred.)
+    ' Moved shape by shape: Shape.Move is the call the working dimension macro uses.
+    Dim movingShape As Shape
+    For Each movingShape In dupShapes
+        movingShape.Move cellX, cellY
+    Next movingShape
 
     ' If the source page is bigger than the cell, you may want to scale
     ' it down to fit instead of clipping. Uncomment to enable fit-scaling:
