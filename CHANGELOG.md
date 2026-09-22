@@ -39,6 +39,11 @@ CHANGELOG entry here, not just internal refactors (§43).
 - Verified in the `.gms`: components `ThisMacroStorage, frmDimension, mdlFormBuilder` + the
   9 modules; `frmDimension` has 29 controls and `LoadFormState`; `modDimension` uses the
   direct form path.
+- Follow-up (reported as "form is clipped"): the rebuilt form kept the default **240x180 pt**
+  size while its controls span 300x441, and its `Caption` was still the default
+  `UserForm1`. The form is now **330x486 pt** with `Caption = "Vittix Dimension"`. The form
+  property setters take **string** values (an Int32 is rejected), and `Width`/`Height` are
+  outer (points) while control `Left`/`Top` are inner coordinates.
 
 ### Added — binary .gms build (dimension-tools)
 - **`build/deploy.ps1 -OutDir <dir>`** copies the rebuilt `.gms` out as a build

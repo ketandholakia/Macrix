@@ -83,6 +83,23 @@ try {
     Btn 'cmdCancel' 'Cancel' 160 416
     Write-Host ('controls added: ' + $d.Controls.Count)
 
+    # Size the form to contain every control. Note: the form property setters take
+    # STRING values, and Width/Height are POINTS covering the border, while control
+    # Left/Top are inner coordinates -- hence the margins. Without this the form keeps
+    # the default 240x180 and clips everything below the top rows.
+    $maxR = 0; $maxB = 0
+    foreach ($ct in $d.Controls) {
+        $r = [double]$ct.Left + [double]$ct.Width
+        $b = [double]$ct.Top + [double]$ct.Height
+        if ($r -gt $maxR) { $maxR = $r }
+        if ($b -gt $maxB) { $maxB = $b }
+    }
+    $form.Properties.Item('Caption').Value = 'Vittix Dimension'
+    $form.Properties.Item('Width').Value = [string]([int]([math]::Ceiling($maxR) + 30))
+    $form.Properties.Item('Height').Value = [string]([int]([math]::Ceiling($maxB) + 45))
+    $form.Properties.Item('StartUpPosition').Value = '1'
+    Write-Host ('form size set to {0} x {1} pt (controls need {2} x {3})' -f $form.Properties.Item('Width').Value, $form.Properties.Item('Height').Value, $maxR, $maxB)
+
     $code = @'
 Option Explicit
 
