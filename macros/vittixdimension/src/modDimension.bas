@@ -1,5 +1,6 @@
 Attribute VB_Name = "modDimension"
 Option Explicit
+Option Private Module
 Rem modDimension.bas - orchestration for measuring and placing dimension labels
 
 Public Type VDT_DimensionInfo

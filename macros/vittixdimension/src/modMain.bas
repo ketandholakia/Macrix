@@ -17,7 +17,10 @@ ErrHandler:
     LogError "VittixDimensionTools_Main", Err.Number, Err.Description
 End Sub
 
-Public Sub VittixDimensionTools_Create(Optional hideMe As Boolean = True)
+' Only VittixDimension is meant to appear in CorelDRAW's macro list. The OK
+' button on the dialog calls CreateDimensionsForSelection (modDimension) directly,
+' so this stays Private and is therefore not listed.
+Private Sub VittixDimensionTools_Create(Optional hideMe As Boolean = True)
     On Error GoTo ErrHandler
     If ActiveDocument Is Nothing Then
         MsgBox "Open a document before creating dimensions.", vbExclamation, "Vittix"

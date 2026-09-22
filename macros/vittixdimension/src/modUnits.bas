@@ -1,5 +1,6 @@
 Attribute VB_Name = "modUnits"
 Option Explicit
+Option Private Module
 Rem modUnits.bas - unit conversion helpers
 
 Public Enum VDTUnit

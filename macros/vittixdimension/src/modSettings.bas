@@ -1,5 +1,6 @@
 Attribute VB_Name = "modSettings"
 Option Explicit
+Option Private Module
 Rem modSettings.bas - centralized settings storage and persistence helpers
 
 Public Type VDT_Settings

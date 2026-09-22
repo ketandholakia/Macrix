@@ -150,7 +150,13 @@ Private Sub cmdOK_Click()
     On Error GoTo ErrHandler
     ReadSettingsFromForm Me, gSettings
     SaveSettings
-    VittixDimensionTools_Create
+    If ActiveDocument Is Nothing Then
+        MsgBox "Open a document before creating dimensions.", vbExclamation, "Vittix"
+        Exit Sub
+    End If
+    ' modMain.VittixDimensionTools_Create is Private (so it is not listed in the
+    ' macro list); call the worker in modDimension directly.
+    CreateDimensionsForSelection gSettings
     Unload Me
     Exit Sub
 ErrHandler:

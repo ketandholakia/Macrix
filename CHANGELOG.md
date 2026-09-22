@@ -22,6 +22,15 @@ CHANGELOG entry here, not just internal refactors (§43).
   CI files to LF.
 - **`docs/WORKFLOW.md`** — the end-to-end macro development loop.
 
+### Changed — dimension-tools: one entry only in CorelDRAW's macro list
+- Added `Option Private Module` to `modDimension`, `modLabel`, `modLayers`,
+  `modSettings`, `modUnits` and `mdlFormBuilder` (`modGeometry`/`modUtils` already had it).
+  Their public procedures still work everywhere inside the project but no longer appear in
+  CorelDRAW's macro list.
+- `modMain.VittixDimensionTools_Create` is now **Private** (it was a second listing), and
+  the dialog's OK button calls `modDimension.CreateDimensionsForSelection` directly.
+- Verified against the project itself: `GMSProject.Macros.Count = 1` → `modMain.VittixDimension`.
+
 ### Fixed/Added — dimension-tools: colour actually applies, plus a swatch picker
 - **Fixed: a hand-typed colour had no effect.** `ApplyTextFormatting` ran
   `story.Font = "Arial"` (an unsupported member on a TextRange) and shared a single error

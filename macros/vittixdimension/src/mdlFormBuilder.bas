@@ -10,6 +10,7 @@ Attribute VB_Name = "mdlFormBuilder"
 ' The injected code-behind mirrors the form logic in modSettings.
 '==============================================================
 Option Explicit
+Option Private Module
 
 Private Const FORM_NAME As String = "frmDimension"
 

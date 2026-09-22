@@ -1,5 +1,6 @@
 Attribute VB_Name = "modLabel"
 Option Explicit
+Option Private Module
 Rem modLabel.bas - label creation and styling
 
 ' Base point size used when building a label. The label is then scaled to a
