@@ -77,6 +77,11 @@ Public Sub RunImposition()
     outDoc.Unit = g_Unit
     outDoc.ReferencePoint = cdrTopLeft
 
+    ' Clipboard work needs events ENABLED. With EventsEnabled = False the Copy below
+    ' silently copies nothing, so every Paste comes back empty -- which is why the
+    ' placement found zero new shapes on the sheet page.
+    Application.EventsEnabled = True
+
     slotIndex = LBound(orderArr)
 
     For sheetIndex = 1 To totalSheets
@@ -264,10 +269,19 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
         dupShapes.Add outPage.Shapes(i)
     Next i
 
-    ' Last resort: a paste normally leaves the new shapes selected.
-    If dupShapes.Count = 0 Then Set dupShapes = outDoc.Selection
-    If dupShapes Is Nothing Then Exit Sub
-    If dupShapes.Count = 0 Then Exit Sub
+    If dupShapes.Count = 0 Then
+        ' Nothing landed on the sheet page. Surface the counts instead of failing
+        ' silently (and do NOT fall back to Document.Selection -- it is a pointer-typed
+        ' member that raises "Run-time error 13: Type mismatch" when assigned in VBA).
+        MsgBox "Nothing was pasted for source page " & CStr(srcPageIdx) & "." & vbCrLf & vbCrLf & _
+               "Shapes on the source page      : " & CStr(srcPage.Shapes.Count) & vbCrLf & _
+               "Shapes on the sheet page before: " & CStr(beforeCount) & vbCrLf & _
+               "Shapes on the sheet page after : " & CStr(outPage.Shapes.Count) & vbCrLf & vbCrLf & _
+               "If the source count is 0, or the source objects sit on a locked layer, " & _
+               "Copy copies nothing and the paste comes back empty.", _
+               vbExclamation, "Imposition"
+        Exit Sub
+    End If
 
     ' Position: align pasted content's top-left to the cell's top-left.
     ' (Assumes outDoc.ReferencePoint = cdrTopLeft, set in RunImposition.)
