@@ -231,6 +231,9 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
     Dim srcShapes As ShapeRange
     Dim dupShapes As ShapeRange
     Dim originalActiveDoc As Document
+    Dim beforeShapes As ShapeRange
+    Dim beforeCount As Long
+    Dim i As Long
 
     Set originalActiveDoc = Application.ActiveDocument
     Set srcPage = srcDoc.Pages(srcPageIdx)
@@ -248,12 +251,21 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
     ' or method".
     outDoc.Activate
     outPage.Activate
-    Set dupShapes = outPage.ActiveLayer.Paste
-    ' Layer.Paste returns a pointer-typed result that VBA can surface as Nothing even
-    ' though the paste succeeded -- the pasted shapes become the selection, so fall back
-    ' to it. (Previously this raised "Run-time error 91: Object variable not set" on
-    ' dupShapes.SetPosition.)
-    If dupShapes Is Nothing Then Set dupShapes = outDoc.Selection
+
+    ' Identify the pasted shapes by counting before/after. Both Layer.Paste and
+    ' Document.Selection are pointer-typed members that VBA can surface as Nothing even
+    ' when they succeed -- that is what raised "Run-time error 91" on SetPosition.
+    Set beforeShapes = outPage.Shapes.All
+    beforeCount = beforeShapes.Count
+    outPage.ActiveLayer.Paste
+
+    Set dupShapes = New ShapeRange
+    For i = beforeCount + 1 To outPage.Shapes.Count
+        dupShapes.Add outPage.Shapes(i)
+    Next i
+
+    ' Last resort: a paste normally leaves the new shapes selected.
+    If dupShapes.Count = 0 Then Set dupShapes = outDoc.Selection
     If dupShapes Is Nothing Then Exit Sub
     If dupShapes.Count = 0 Then Exit Sub
 
