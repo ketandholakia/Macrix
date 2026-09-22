@@ -297,9 +297,14 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
         Exit Sub
     End If
 
-    ' Position: align pasted content's top-left to the cell's top-left.
-    ' (Assumes outDoc.ReferencePoint = cdrTopLeft, set in RunImposition.)
-    dupShapes.SetPosition cellX, cellY
+    ' Position: align the copied content's TOP-LEFT to the cell's top-left.
+    ' ShapeRange.SetPosition positions the range's CENTRE (and in practice left the
+    ' copies where they were, stacked in the middle of the sheet), so measure the current
+    ' top-left and move by the exact delta instead.
+    Dim dx As Double, dy As Double
+    dx = cellX - dupShapes.LeftX
+    dy = cellY - dupShapes.TopY
+    dupShapes.Move dx, dy
 
     ' If the source page is bigger than the cell, you may want to scale
     ' it down to fit instead of clipping. Uncomment to enable fit-scaling:
