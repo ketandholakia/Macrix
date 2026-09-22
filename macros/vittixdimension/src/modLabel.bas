@@ -139,18 +139,35 @@ End Function
 
 ' Font name, size and colour live on the Story (a TextRange). IMPORTANT: the size
 ' member is .Size -- there is no .FontSize / .FontName, and those fail silently.
+' The steps are deliberately independent and each guards its own errors: before this,
+' a failure in the font-name step jumped to the shared handler and the caption colour
+' was never applied.
 Private Sub ApplyTextFormatting(sh As shape, settings As VDT_Settings)
-    On Error GoTo ErrHandler
-    Dim story As Object
-    If sh Is Nothing Then Exit Sub
-    Set story = sh.Text.Story
-    If story Is Nothing Then Exit Sub
-    story.Font = "Arial"
-    story.Size = DEFAULT_TEXT_POINTS
     ApplyTextColor sh, settings.TextColor
-    Exit Sub
-ErrHandler:
-    LogError "ApplyTextFormatting", Err.Number, Err.Description
+    ApplyStoryFont sh, "Arial"
+    ApplyStorySize sh, DEFAULT_TEXT_POINTS
+End Sub
+
+Private Function StoryOf(sh As shape) As Object
+    On Error Resume Next
+    If sh Is Nothing Then Exit Function
+    Set StoryOf = sh.Text.Story
+End Function
+
+Private Sub ApplyStoryFont(sh As shape, ByVal fontName As String)
+    On Error Resume Next
+    Dim story As Object
+    Set story = StoryOf(sh)
+    If story Is Nothing Then Exit Sub
+    story.Font = fontName
+End Sub
+
+Private Sub ApplyStorySize(sh As shape, ByVal points As Double)
+    On Error Resume Next
+    Dim story As Object
+    Set story = StoryOf(sh)
+    If story Is Nothing Then Exit Sub
+    story.Size = points
 End Sub
 
 ' Colour the caption. For artistic text the visible colour is the shape's fill.

@@ -50,9 +50,14 @@ try {
     Write-Host ('created form component: ' + $form.Name)
 
     $d = $form.Designer
+    function HexToOle($hex) {
+        $h = ([string]$hex).TrimStart('#')
+        return ([Convert]::ToInt32($h.Substring(0,2),16) + [Convert]::ToInt32($h.Substring(2,2),16)*256 + [Convert]::ToInt32($h.Substring(4,2),16)*65536)
+    }
     function AddCtl($progId, $name, $left, $top, $w, $h) {
         $c = $d.Controls.Add($progId, $name)
-        $c.Left = $left; $c.Top = $top; $c.Width = $w; $c.Height = $h
+        # MSForms geometry is Single; passing a Double throws 'Specified cast is not valid'.
+        $c.Left = [single]$left; $c.Top = [single]$top; $c.Width = [single]$w; $c.Height = [single]$h
         return $c
     }
     function Lbl($n, $cap, $l, $t, $w)     { $c = AddCtl 'Forms.Label.1' $n $l $t $w 17; $c.Caption = $cap }
@@ -60,28 +65,37 @@ try {
     function Txt($n, $l, $t, $w)           { AddCtl 'Forms.TextBox.1' $n $l $t $w 20 | Out-Null }
     function Chk($n, $cap, $l, $t, $w, $v) { $c = AddCtl 'Forms.CheckBox.1' $n $l $t $w 17; $c.Caption = $cap; $c.Value = $v }
     function Btn($n, $cap, $l, $t)         { $c = AddCtl 'Forms.CommandButton.1' $n $l $t 90 25; $c.Caption = $cap }
-    function Swt($n, $l, $t, $w)           { $c = AddCtl 'Forms.Label.1' $n $l $t $w 16; $c.Caption = ''; $c.BackColor = 0; $c.BorderStyle = 1 }
+    function Swt($n, $l, $t, $w, $hex)     { $c = AddCtl 'Forms.Label.1' $n $l $t $w 16; $c.Caption = ''; $c.BorderStyle = 1; $c.BackColor = (HexToOle $hex); $c.Tag = $hex }
 
     Lbl 'lblUnit' 'Unit' 16 16 100;                      Cmb 'cmbUnit' 120 13
     Lbl 'lblDecimals' 'Decimals' 16 46 100;              Cmb 'cmbDecimals' 120 43
     Lbl 'lblPosition' 'Position' 16 76 100;              Cmb 'cmbPosition' 120 73
-    Lbl 'lblTextColor' 'Text Color' 16 106 100;          Txt 'txtTextColor' 120 106 130; Swt 'lblColorSwatch' 256 107 40
-    Lbl 'lblTextWidthPercent' 'Text Width %' 16 136 100; Txt 'txtTextWidthPercent' 120 136 160
-    Lbl 'lblGap' 'Gap (mm)' 16 166 100;                  Txt 'txtGap' 120 166 160
-    Lbl 'lblPadding' 'Padding (mm)' 16 196 100;          Txt 'txtPadding' 120 196 160
-    Lbl 'lblCornerRadius' 'Corner Radius (mm)' 16 226 130; Txt 'txtCornerRadius' 150 226 130
-    Chk 'chkShowWidth' 'Show Width' 16 261 130 $true
-    Chk 'chkShowHeight' 'Show Height' 16 283 130 $true
-    Chk 'chkShowArea' 'Show Area' 16 305 130 $false
-    Chk 'chkShowPerimeter' 'Show Perimeter' 16 327 130 $false
-    Chk 'chkShowObjectCount' 'Show Object Count' 150 261 150 $false
-    Chk 'chkBackgroundBox' 'Background Box' 150 283 150 $true
-    Chk 'chkRoundedBackground' 'Rounded Background' 150 305 150 $false
-    Chk 'chkCreateLayer' 'Create Layer' 150 327 150 $true
-    Chk 'chkRememberSettings' 'Remember Settings' 16 351 200 $true
-    Lbl 'lblTemplate' 'Template' 16 381 100;             Txt 'txtTemplate' 120 381 160
-    Btn 'cmdOK' 'OK' 60 416
-    Btn 'cmdCancel' 'Cancel' 160 416
+    # palette shown as clickable swatches (2 rows x 12)
+    $palette = @(
+        '#000000', '#404040', '#808080', '#C0C0C0', '#FFFFFF', '#FF0000', '#FF8000', '#FFFF00', '#00B050', '#00B0F0', '#0000FF', '#800080',
+        '#C00000', '#FFC000', '#92D050', '#00FF00', '#00FFFF', '#0070C0', '#7030A0', '#FF00FF', '#A52A2A', '#F5DEB3', '#FFC0CB', '#2F4F4F'
+    )
+
+    Lbl 'lblTextColor' 'Text Color' 16 106 100;          Txt 'txtTextColor' 120 106 130; Swt 'lblColorSwatch' 256 107 40 '#000000'
+    for ($i = 0; $i -lt $palette.Count; $i++) {
+        Swt ('sw{0:d2}' -f ($i + 1)) ([int](16 + ($i % 12) * 18)) ([int](130 + [math]::Floor($i / 12) * 18)) 16 $palette[$i]
+    }
+    Lbl 'lblTextWidthPercent' 'Text Width %' 16 190 100; Txt 'txtTextWidthPercent' 120 190 160
+    Lbl 'lblGap' 'Gap (mm)' 16 220 100;                  Txt 'txtGap' 120 220 160
+    Lbl 'lblPadding' 'Padding (mm)' 16 250 100;          Txt 'txtPadding' 120 250 160
+    Lbl 'lblCornerRadius' 'Corner Radius (mm)' 16 280 130; Txt 'txtCornerRadius' 150 280 130
+    Chk 'chkShowWidth' 'Show Width' 16 315 130 $true
+    Chk 'chkShowHeight' 'Show Height' 16 337 130 $true
+    Chk 'chkShowArea' 'Show Area' 16 359 130 $false
+    Chk 'chkShowPerimeter' 'Show Perimeter' 16 381 130 $false
+    Chk 'chkShowObjectCount' 'Show Object Count' 150 315 150 $false
+    Chk 'chkBackgroundBox' 'Background Box' 150 337 150 $true
+    Chk 'chkRoundedBackground' 'Rounded Background' 150 359 150 $false
+    Chk 'chkCreateLayer' 'Create Layer' 150 381 150 $true
+    Chk 'chkRememberSettings' 'Remember Settings' 16 405 200 $true
+    Lbl 'lblTemplate' 'Template' 16 435 100;             Txt 'txtTemplate' 120 435 160
+    Btn 'cmdOK' 'OK' 60 470
+    Btn 'cmdCancel' 'Cancel' 160 470
 
     # OK is the default button (Enter); Cancel responds to Esc.
     $d.Controls.Item('cmdOK').Default = $true
@@ -187,6 +201,26 @@ Private Sub PopulateControls()
     End If
 End Sub
 '@
+    # Generated: one click handler per palette swatch. Each swatch carries its hex in
+    # Tag, so the handler just copies it into the Text Color field.
+    $sb = New-Object System.Text.StringBuilder
+    [void]$sb.AppendLine('')
+    [void]$sb.AppendLine('Private Sub SetColorFromSwatch(ByVal ctlName As String)')
+    [void]$sb.AppendLine('    On Error Resume Next')
+    [void]$sb.AppendLine('    Dim ctl As Object')
+    [void]$sb.AppendLine('    Set ctl = Me.Controls(ctlName)')
+    [void]$sb.AppendLine('    If ctl Is Nothing Then Exit Sub')
+    [void]$sb.AppendLine('    txtTextColor.text = CStr(ctl.Tag)')
+    [void]$sb.AppendLine('End Sub')
+    for ($i = 1; $i -le $palette.Count; $i++) {
+        $nm = 'sw{0:d2}' -f $i
+        [void]$sb.AppendLine('')
+        [void]$sb.AppendLine("Private Sub ${nm}_Click()")
+        [void]$sb.AppendLine("    SetColorFromSwatch ""$nm""")
+        [void]$sb.AppendLine('End Sub')
+    }
+    $code = $code + "`r`n" + $sb.ToString()
+
     $cm = $form.CodeModule
     if ($cm.CountOfLines -gt 0) { $cm.DeleteLines(1, $cm.CountOfLines) }
     $cm.AddFromString($code)
