@@ -5,7 +5,7 @@ Rem modUtils.bas - logging and common helpers
 
 Public Sub LogError(procName As String, errNum As Long, errDesc As String)
     On Error Resume Next
-    MsgBox "Error in " & procName & ": [" & errNum & "] " & errDesc, vbCritical, "Vittix Error"
+    MsgBox "Error in " & procName & ": [" & errNum & "] " & errDesc, vbCritical, "Macrix Error"
 End Sub
 
 Public Function SafeTrim(value As Variant) As String

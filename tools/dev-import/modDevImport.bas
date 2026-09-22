@@ -5,7 +5,7 @@ Option Explicit
 '
 ' Purpose: pull every staged .bas/.frm from a staging folder into the VBA project
 ' this module lives in, so a source change on disk can be pushed into the live
-' Vittix.gms with one call — after a ONE-TIME manual import of this file.
+' Macrix.gms with one call — after a ONE-TIME manual import of this file.
 '
 ' Why a separate file: this module lives in tools\dev-import and is deliberately
 ' NOT part of the staged set, so it never removes/re-imports itself mid-run.
@@ -21,8 +21,8 @@ Option Explicit
 ' CorelDRAW: yes (VBIDE automation) — characterization pending.
 
 Private Const Dev_SelfName As String = "modDevImport"
-Private Const Dev_StagingEnv As String = "VITTIX_STAGING"
-Private Const Dev_StagingSub As String = "Vittix\staging"
+Private Const Dev_StagingEnv As String = "MACRIX_STAGING"
+Private Const Dev_StagingSub As String = "Macrix\staging"
 
 ' Import (or replace) every staged module into this project.
 Public Sub DevImport_RunAll()
@@ -36,14 +36,14 @@ Public Sub DevImport_RunAll()
                "CorelDRAW must allow VBA project access. Enable it in" & vbCrLf & _
                "Tools > Options > VBA (CorelDRAW) / the VBE security options," & vbCrLf & _
                "then restart CorelDRAW and try again.", _
-               vbExclamation, "Vittix Dev Import"
+               vbExclamation, "Macrix Dev Import"
         GoTo Cleanup
     End If
 
     Set proj = p_FindOwnProject(vbe)
     If proj Is Nothing Then
         MsgBox "Could not find the VBA project that contains " & Dev_SelfName & ".", _
-               vbCritical, "Vittix Dev Import"
+               vbCritical, "Macrix Dev Import"
         GoTo Cleanup
     End If
 
@@ -51,7 +51,7 @@ Public Sub DevImport_RunAll()
     If Dir$(dir, vbDirectory) = "" Then
         MsgBox "Staging folder not found:" & vbCrLf & dir & vbCrLf & vbCrLf & _
                "Run  build\deploy.ps1 -Stage  first to stage modules.", _
-               vbExclamation, "Vittix Dev Import"
+               vbExclamation, "Macrix Dev Import"
         GoTo Cleanup
     End If
 
@@ -63,12 +63,12 @@ Public Sub DevImport_RunAll()
            "  Imported: " & CStr(imported) & vbCrLf & _
            "  Replaced: " & CStr(replaced) & vbCrLf & _
            "  Failed  : " & CStr(failed) & vbCrLf & vbCrLf & _
-           "From: " & dir, vbInformation, "Vittix Dev Import"
+           "From: " & dir, vbInformation, "Macrix Dev Import"
 
 Cleanup:
     If Err.Number <> 0 Then
         MsgBox "Dev import failed: [" & CStr(Err.Number) & "] " & Err.Description, _
-               vbCritical, "Vittix Dev Import"
+               vbCritical, "Macrix Dev Import"
     End If
 End Sub
 

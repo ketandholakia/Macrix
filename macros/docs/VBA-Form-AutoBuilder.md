@@ -1,12 +1,12 @@
 # VBA Form Auto-Builder Guide
 
-> **Status note:** `vittixBleed` originally shipped a `mdlFormBuilder.bas` using this
+> **Status note:** `macrixBleed` originally shipped a `mdlFormBuilder.bas` using this
 > approach, but it was never wired up (nothing called `BuildMainViewFormWithCode`) and
 > it was incomplete - it didn't create the `cbRound`/`obRound0-2` controls that
 > `MainLogic.Create` expects, and its injected button captions were placeholder text
 > rather than real strings. `Sync-To-GMS.ps1` imports `MainView.frm` directly and that
 > works fine, so the file was removed rather than finished. If the `.frm` import error
-> described below ever resurfaces for `vittixBleed` or a future macro, revive this
+> described below ever resurfaces for `macrixBleed` or a future macro, revive this
 > pattern from the boilerplate below - just make sure the generated control set exactly
 > matches what the form's code-behind expects, and use real caption text, not
 > placeholders.

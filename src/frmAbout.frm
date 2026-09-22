@@ -1,6 +1,6 @@
 VERSION 5.0
 Begin VB.UserForm frmAbout
-   Caption         =   "Vittix CorelDRAW Macros"
+   Caption         =   "Macrix CorelDRAW Macros"
    ClientHeight    =   2280
    ClientLeft      =   120
    ClientTop       =   465
@@ -15,7 +15,7 @@ Begin VB.UserForm frmAbout
       Width           =   855
    End
    Begin VB.Label lblInfo
-      Caption         =   "Vittix CorelDRAW Macros"
+      Caption         =   "Macrix CorelDRAW Macros"
       Height          =   375
       Left            =   240
       TabIndex        =   0
@@ -31,7 +31,7 @@ Option Explicit
 
 Public Sub OpenDialog()
     lblInfo.Caption = modVersion.VER_KitName & " v" & modVersion.VER_CurrentVersion & vbCrLf & _
-        "Copyright (c) 2026 Vittix"
+        "Copyright (c) 2026 Macrix"
     modDialogHelper.DH_ShowModal Me
 End Sub
 

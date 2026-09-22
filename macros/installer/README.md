@@ -1,6 +1,6 @@
-# Vittix CDR Macros — Installer
+# Macrix CDR Macros — Installer
 
-Inno Setup script (`VittixMacros.iss`) that packages all macros in this repo
+Inno Setup script (`MacrixMacros.iss`) that packages all macros in this repo
 into one Windows installer with a checkbox per macro, and optionally drives
 the existing `Sync-*-To-GMS.ps1` scripts to import the chosen macro(s)
 straight into a running CorelDRAW instance.
@@ -8,12 +8,12 @@ straight into a running CorelDRAW instance.
 ## Where this lives in the repo
 
 ```
-vittixcdrMacro/
+macrixcdrMacro/
 ├── installer/
-│   ├── VittixMacros.iss   ← this script
+│   ├── MacrixMacros.iss   ← this script
 │   └── README.md           ← this file
-├── VittixSelectSame/
-├── vittixBleed/
+├── MacrixSelectSame/
+├── macrixBleed/
 ├── scripts/
 └── dist/                   ← build output goes here (gitignore this)
 ```
@@ -25,9 +25,9 @@ move the `.iss` file, update that one line.
 
 1. Install [Inno Setup 6](https://jrsoftware.org/isinfo.php) (free). ISPP is
    bundled — no separate install needed.
-2. Open `VittixMacros.iss` in the Inno Setup IDE (or `iscc.exe VittixMacros.iss`
+2. Open `MacrixMacros.iss` in the Inno Setup IDE (or `iscc.exe MacrixMacros.iss`
    from the command line).
-3. Compile. Output lands in `dist\VittixCDRMacros-Setup-<version>.exe`.
+3. Compile. Output lands in `dist\MacrixCDRMacros-Setup-<version>.exe`.
 
 ## Adding a new macro later
 
@@ -36,13 +36,13 @@ in the script:
 
 1. **`[Components]`** — one line:
    ```
-   Name: "macro\dimension"; Description: "VittixDimensionTools — dimensioning tools"; Types: full custom
+   Name: "macro\dimension"; Description: "MacrixTools — dimensioning tools"; Types: full custom
    ```
 
 2. **`[Files]`** — one 4-line block (source, forms, and both sync scripts):
    ```
-   Source: "{#RepoRoot}VittixDimensionTools\src\*"; DestDir: "{app}\VittixDimensionTools\src"; Components: macro\dimension; Flags: recursesubdirs ignoreversion
-   Source: "{#RepoRoot}VittixDimensionTools\forms\*"; DestDir: "{app}\VittixDimensionTools\forms"; Components: macro\dimension; Flags: recursesubdirs ignoreversion
+   Source: "{#RepoRoot}MacrixTools\src\*"; DestDir: "{app}\MacrixTools\src"; Components: macro\dimension; Flags: recursesubdirs ignoreversion
+   Source: "{#RepoRoot}MacrixTools\forms\*"; DestDir: "{app}\MacrixTools\forms"; Components: macro\dimension; Flags: recursesubdirs ignoreversion
    Source: "{#RepoRoot}scripts\Sync-Dimension-To-GMS.ps1"; DestDir: "{app}\scripts"; Components: macro\dimension; Flags: ignoreversion
    Source: "{#RepoRoot}scripts\Sync-Dimension-From-GMS.ps1"; DestDir: "{app}\scripts"; Components: macro\dimension; Flags: ignoreversion
    ```
@@ -51,7 +51,7 @@ in the script:
    add one row:
    ```pascal
    MacroList[2].ComponentName := 'macro\dimension';
-   MacroList[2].ProjectName   := 'VittixDimensionTools';  // must match the GMS project name exactly
+   MacroList[2].ProjectName   := 'MacrixTools';  // must match the GMS project name exactly
    MacroList[2].SyncScript    := 'Sync-Dimension-To-GMS.ps1';
    ```
 

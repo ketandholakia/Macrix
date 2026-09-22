@@ -53,7 +53,7 @@ powershell -File build/deploy.ps1
 powershell -File build/deploy.ps1 -Apply
 
 # Target a different project / folder
-powershell -File build/deploy.ps1 -Project VittixDimensionTools.gms -Apply
+powershell -File build/deploy.ps1 -Project MacrixTools.gms -Apply
 ```
 
 Behaviour and safety:
@@ -90,7 +90,7 @@ Runs *inside* CorelDRAW, where VBE access is native.
    ```powershell
    powershell -File build/deploy.ps1 -Stage
    ```
-   → copies `src\*.bas` / `*.frm` into `%APPDATA%\Vittix\staging`.
+   → copies `src\*.bas` / `*.frm` into `%APPDATA%\Macrix\staging`.
 
 2. **One time:** in the CorelDRAW VBE, import `tools\dev-import\modDevImport.bas`
    into the target project (File → Import File…).
@@ -133,7 +133,7 @@ as a build artifact:
 ```powershell
 powershell -File build/deploy.ps1 -Macro dimension-tools -Apply -StartCorel `
     -OutDir build\_out\macros\dimension-tools
-# -> build\_out\macros\dimension-tools\VittixDimensionTools.gms  (magic 47 4D 53 01)
+# -> build\_out\macros\dimension-tools\MacrixTools.gms  (magic 47 4D 53 01)
 ```
 
 Behaviour confirmed against a live CorelDRAW 2021 (v23.5.0.506):

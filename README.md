@@ -1,4 +1,4 @@
-# Vittix CorelDRAW Macro Development
+# Macrix CorelDRAW Macro Development
 
 Development repository for a set of **CorelDRAW VBA macros**. Each macro is its own
 CorelDRAW VBA project (its own `.gms`); this repository holds the macro sources, the
@@ -9,10 +9,10 @@ CorelDRAW.
 
 | Macro | CorelDRAW project | Sources | Entry point(s) | Forms |
 | --- | --- | --- | --- | --- |
-| Vittix Select Same | `VittixSelectSame` | `macros/VittixSelectSame/` | `mdlMain.SelectSimilarObjects` | imported |
-| Vittix Bleed | `vittixBleed` | `macros/vittixBleed/` | `Bleeds.Start` | imported |
-| Vittix Dimension Tools | `VittixDimensionTools` | `macros/vittixdimension/` | `modMain.VittixDimension`, `modMain.VittixDimensionTools_Create` | built at runtime |
-| Vittix Imposition | `vittixImposition` | `macros/vittixImposition/` | `modImposition.RunImposition` | built at runtime |
+| Macrix Select Same | `MacrixSelectSame` | `macros/MacrixSelectSame/` | `mdlMain.SelectSimilarObjects` | imported |
+| Macrix Bleed | `macrixBleed` | `macros/macrixBleed/` | `Bleeds.Start` | imported |
+| Macrix Dimension Tools | `MacrixTools` | `macros/macrixTools/` | `modMain.MacrixDimension`, `modMain.MacrixTools_Create` | built at runtime |
+| Macrix Imposition | `macrixImposition` | `macros/macrixImposition/` | `modImposition.RunImposition` | built at runtime |
 
 The macros are four separate VBA projects whose module names collide, so they stay
 as four projects rather than being flattened into one. Per-macro details and known

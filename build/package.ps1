@@ -1,5 +1,5 @@
 # package.ps1 -- assemble a versioned source package + docs for the installer.
-# Requires Windows PowerShell. Produces build\_out\{version}\VittixCore.gms-all\ ...
+# Requires Windows PowerShell. Produces build\_out\{version}\MacrixCore.gms-all\ ...
 # Reads version from src\modVersion.bas (VER_CurrentVersion).
 param(
     [string]$Src = (Join-Path $PSScriptRoot '..\src'),
@@ -16,7 +16,7 @@ if (Test-Path $verFile) {
     $version = '0.0.0'
 }
 
-$staging = Join-Path $Out 'Vittix'
+$staging = Join-Path $Out 'Macrix'
 if (Test-Path $staging) { Remove-Item $staging -Recurse -Force }
 New-Item -ItemType Directory -Path $staging -Force | Out-Null
 
@@ -24,7 +24,7 @@ New-Item -ItemType Directory -Path $staging -Force | Out-Null
 Copy-Item -Path $Src -Destination $staging -Recurse -Force
 Copy-Item -Path (Join-Path $PSScriptRoot '\installer') -Destination $staging -Recurse -Force -ErrorAction SilentlyContinue
 
-$zip = Join-Path $Out ("Vittix" + ($version -replace '\.','') + '.zip')
+$zip = Join-Path $Out ("Macrix" + ($version -replace '\.','') + '.zip')
 if (Test-Path $zip) { Remove-Item $zip -Force }
 Compress-Archive -Path (Join-Path $staging '*') -DestinationPath $zip
 Write-Host "Packaged $version -> $zip"

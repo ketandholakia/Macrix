@@ -6,7 +6,7 @@ with `docs/ADDING_A_MACRO.md` (rules) and `docs/RELEASE_CHECKLIST.md` (shipping)
 ## 0. One-time setup
 - `git init` (or clone), then `powershell -File build/validate.ps1` should be clean.
 - Locate the CorelDRAW GMS folder: `build\sync_gms_modules.bat` auto-detects it,
-  or set the `VITTIX_GMS_DIR` environment variable to override.
+  or set the `MACRIX_GMS_DIR` environment variable to override.
 
 ## 1. Scaffold a macro
 ```powershell

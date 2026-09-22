@@ -1,4 +1,4 @@
-# Vittix Imposition Tool (`/vittixImposition`)
+# Macrix Imposition Tool (`/macrixImposition`)
 
 A VBA macro for CorelDRAW that imposes all pages of the active document onto
 new output sheets, according to configurable grid/layout settings.
@@ -27,7 +27,7 @@ repository using the PowerShell scripts in the `scripts` directory:
 - **`Sync-From-GMS.ps1`** — Extracts modules and forms from the running CorelDRAW
   instance into the `src` and `forms` directories. Run this **before you commit** to Git.
 - **`Sync-To-GMS.ps1`** — Pushes `.bas`, `.cls`, and `.frm` files from `src` and
-  `forms` into the CorelDRAW VBA project named `vittixImposition`. The macro must
+  `forms` into the CorelDRAW VBA project named `macrixImposition`. The macro must
   already exist as a saved Global Macro Project of that name in CorelDRAW.
 
 ## Settings
@@ -68,4 +68,4 @@ Both the macro and the form read/write these directly.
 - Recommend testing Signature mode on a small, disposable 8-page test
   document before trusting it on a real job.
 
-*Developed for the Vittix workflow.*
+*Developed for the Macrix workflow.*

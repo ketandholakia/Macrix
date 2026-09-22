@@ -9,7 +9,7 @@ Option Explicit
 ' CorelDRAW dependency: none.
 ''
 
-Public Const VER_KitName As String = "Vittix CorelDRAW Macros"
+Public Const VER_KitName As String = "Macrix CorelDRAW Macros"
 
 ' SemVer: MAJOR.MINOR.PATCH (no prerelease/build-meta for the toolkit itself).
 Public Function VER_CurrentVersion() As String

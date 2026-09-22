@@ -1,6 +1,6 @@
 Attribute VB_Name = "mdlFormBuilder"
 '==============================================================
-' mdlFormBuilder (vittixImposition)
+' mdlFormBuilder (macrixImposition)
 '
 ' Builds frmImpositionSettings as a real MSForms VBA UserForm at
 ' runtime via the VBE Extensibility model. This replaces importing

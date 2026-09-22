@@ -3,8 +3,8 @@
 
   Reads macros\registry.json (the declarative list of the CorelDRAW macro projects
   this framework manages). Sources live under a macro root, which defaults to the
-  sibling checkout ..\vittixcdrMacro and can be overridden with -MacroRoot or the
-  VITTIX_MACRO_ROOT environment variable.
+  sibling checkout ..\macrixcdrMacro and can be overridden with -MacroRoot or the
+  MACRIX_MACRO_ROOT environment variable.
 
   Usage:
     powershell -File build/macros.ps1              # table of macros + modules/forms
@@ -25,11 +25,11 @@ $regPath  = Join-Path $repoRoot 'macros\registry.json'
 if (-not (Test-Path -LiteralPath $regPath)) { throw "macro registry not found: $regPath" }
 $reg = Get-Content -Raw -LiteralPath $regPath -Encoding UTF8 | ConvertFrom-Json
 
-if (-not $MacroRoot) { $MacroRoot = $env:VITTIX_MACRO_ROOT }
+if (-not $MacroRoot) { $MacroRoot = $env:MACRIX_MACRO_ROOT }
 if (-not $MacroRoot) { $MacroRoot = Join-Path $repoRoot $reg.macroRoot }
 if (-not (Test-Path -LiteralPath $MacroRoot)) {
     Write-Host "Macro root not found: $MacroRoot"
-    Write-Host "Set it with -MacroRoot <path> or the VITTIX_MACRO_ROOT environment variable."
+    Write-Host "Set it with -MacroRoot <path> or the MACRIX_MACRO_ROOT environment variable."
     exit 2
 }
 $MacroRoot = (Resolve-Path -LiteralPath $MacroRoot).Path

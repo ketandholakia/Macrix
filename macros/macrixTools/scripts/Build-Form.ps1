@@ -1,8 +1,8 @@
 <#
-  macros/vittixdimension/scripts/Build-Form.ps1
+  macros/macrixTools/scripts/Build-Form.ps1
 
   Builds the frmDimension UserForm as a REAL design-time form inside the
-  VittixDimensionTools VBA project, then lets CorelDRAW persist it to the .gms.
+  MacrixTools VBA project, then lets CorelDRAW persist it to the .gms.
 
   WHY THIS EXISTS
   The .frm/.frx exported from this project is not importable in a usable way:
@@ -13,7 +13,7 @@
   through the VBIDE Designer API, where the controls are real.
 
   USAGE
-    powershell -File macros\vittixdimension\scripts\Build-Form.ps1
+    powershell -File macros\macrixTools\scripts\Build-Form.ps1
 
   NOTES
   - Requires CorelDRAW installed (launches a headless /Automation instance and
@@ -24,7 +24,7 @@
     would reintroduce the broken, control-less form.
 #>
 $ErrorActionPreference = 'Continue'
-$gmsProject = 'VittixDimensionTools'
+$gmsProject = 'MacrixTools'
 
 $app = $null
 try {
@@ -114,7 +114,7 @@ try {
         if ($r -gt $maxR) { $maxR = $r }
         if ($b -gt $maxB) { $maxB = $b }
     }
-    $form.Properties.Item('Caption').Value = 'Vittix Dimension'
+    $form.Properties.Item('Caption').Value = 'Macrix Dimension'
     $form.Properties.Item('Width').Value = [string]([int]([math]::Ceiling($maxR) + 30))
     $form.Properties.Item('Height').Value = [string]([int]([math]::Ceiling($maxB) + 45))
     $form.Properties.Item('StartUpPosition').Value = '1'
@@ -151,10 +151,10 @@ Private Sub cmdOK_Click()
     ReadSettingsFromForm Me, gSettings
     SaveSettings
     If ActiveDocument Is Nothing Then
-        MsgBox "Open a document before creating dimensions.", vbExclamation, "Vittix"
+        MsgBox "Open a document before creating dimensions.", vbExclamation, "Macrix"
         Exit Sub
     End If
-    ' modMain.VittixDimensionTools_Create is Private (so it is not listed in the
+    ' modMain.MacrixTools_Create is Private (so it is not listed in the
     ' macro list); call the worker in modDimension directly.
     CreateDimensionsForSelection gSettings
     Unload Me

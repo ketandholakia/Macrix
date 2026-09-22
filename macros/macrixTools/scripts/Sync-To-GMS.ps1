@@ -1,6 +1,6 @@
 param(
     [string]$SourceRoot = (Join-Path $PSScriptRoot ".."),
-    [string]$ProjectName = "VittixDimensionTools"
+    [string]$ProjectName = "MacrixTools"
 )
 
 $srcPath = Join-Path $SourceRoot "src"
@@ -50,7 +50,7 @@ Get-ChildItem -Path $srcPath -Filter "*.bas" | ForEach-Object {
     $comp.Name = $_.BaseName
 }
 
-# Import FRM files — SKIPPED for VittixDimensionTools: the .frm in forms/ is a
+# Import FRM files — SKIPPED for MacrixTools: the .frm in forms/ is a
 # VB6-format form that CorelDRAW's VBE cannot load reliably. The UserForm is instead
 # generated at runtime by mdlFormBuilder.BuildDimensionFormWithCode.
 Write-Host "Skipping .frm import (VB6-format form; mdlFormBuilder generates the UserForm at runtime)."

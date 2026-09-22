@@ -47,7 +47,7 @@ Public Sub RunAll()
     T_Check modFeatureRegistry.FR_Count() = countAfterFirst, pass, fail, "FR_RegisterFeatures idempotent"
 
     modLogger.LOG_Info "TEST RUN end: pass=" & CStr(pass) & " fail=" & CStr(fail)
-    Debug.Print "Vittix tests: pass=" & pass & " fail=" & fail
+    Debug.Print "Macrix tests: pass=" & pass & " fail=" & fail
 End Sub
 
 ' Record a single assertion; returns True when the assertion holds.

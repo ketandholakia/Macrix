@@ -3,8 +3,8 @@ param(
     [string]$TargetRoot = (Join-Path $env:APPDATA "Corel\CorelDRAW Graphics Suite 2021\Draw\GMS")
 )
 
-$releaseRoot = Join-Path $SourceRoot "release\VittixDimensionTools"
-$targetPackage = Join-Path $TargetRoot "VittixDimensionTools"
+$releaseRoot = Join-Path $SourceRoot "release\MacrixTools"
+$targetPackage = Join-Path $TargetRoot "MacrixTools"
 
 function Assert-PathExists {
     param([string]$Path, [string]$Label)
@@ -19,6 +19,6 @@ New-Item -ItemType Directory -Force -Path $TargetRoot | Out-Null
 New-Item -ItemType Directory -Force -Path $targetPackage | Out-Null
 
 Copy-Item -Force (Join-Path $releaseRoot "*") $targetPackage -Exclude *.manifest.txt
-Copy-Item -Force (Join-Path $releaseRoot "VittixDimensionTools.manifest.txt") $TargetRoot -ErrorAction SilentlyContinue
+Copy-Item -Force (Join-Path $releaseRoot "MacrixTools.manifest.txt") $TargetRoot -ErrorAction SilentlyContinue
 
-Write-Host "Installed VittixDimensionTools to $targetPackage"
+Write-Host "Installed MacrixTools to $targetPackage"

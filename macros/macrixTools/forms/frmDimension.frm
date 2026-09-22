@@ -1,6 +1,6 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmDimension 
-   Caption         =   "Vittix Dimension"
+   Caption         =   "Macrix Dimension"
    ClientHeight    =   10365
    ClientLeft      =   45
    ClientTop       =   390
@@ -42,7 +42,7 @@ Private Sub cmdOK_Click()
     On Error GoTo ErrHandler
     ReadSettingsFromForm Me, gSettings
     SaveSettings
-    VittixDimensionTools_Create
+    MacrixTools_Create
     Unload Me
     Exit Sub
 ErrHandler:

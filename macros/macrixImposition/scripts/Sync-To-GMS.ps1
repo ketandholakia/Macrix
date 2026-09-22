@@ -1,6 +1,6 @@
 param(
     [string]$SourceRoot = (Join-Path $PSScriptRoot ".."),
-    [string]$ProjectName = "vittixBleed"
+    [string]$ProjectName = "macrixImposition"
 )
 
 $srcPath = Join-Path $SourceRoot "src"
@@ -47,66 +47,21 @@ Write-Host "Importing modules from $srcPath..."
 Get-ChildItem -Path $srcPath -Filter "*.bas" | ForEach-Object {
     Write-Host "  -> $($_.Name)"
     $comp = $project.VBComponents.Import($_.FullName)
-    if ($comp.Name -ne $_.BaseName) {
-        try {
-            $comp.Name = $_.BaseName
-        } catch {
-            Write-Host "  -> Warning: Could not rename to $($_.BaseName). It remains named $($comp.Name)" -ForegroundColor Yellow
-        }
-    }
+    $comp.Name = $_.BaseName
 }
 
 # Import CLS files
 Write-Host "Importing class modules from $srcPath..."
 Get-ChildItem -Path $srcPath -Filter "*.cls" | ForEach-Object {
     Write-Host "  -> $($_.Name)"
-    if ($_.BaseName -eq "ThisMacroStorage") {
-        Write-Host "  -> Syncing ThisMacroStorage code..."
-        $docComp = $project.VBComponents.Item("ThisMacroStorage")
-        $docCode = $docComp.CodeModule
-        if ($docCode.CountOfLines -gt 0) {
-            $docCode.DeleteLines(1, $docCode.CountOfLines)
-        }
-        
-        # Read the file and strip the VBA class headers manually
-        $lines = Get-Content $_.FullName
-        $codeLines = @()
-        $inHeader = $true
-        foreach ($line in $lines) {
-            if ($inHeader) {
-                if ($line -notmatch "^VERSION " -and $line -notmatch "^BEGIN" -and $line -notmatch "^END" -and $line -notmatch "^Attribute " -and $line -notmatch "^\s*MultiUse\s*=") {
-                    $inHeader = $false
-                }
-            }
-            if (-not $inHeader) {
-                $codeLines += $line
-            }
-        }
-        
-        $codeText = $codeLines -join "`r`n"
-        if (-not [string]::IsNullOrWhiteSpace($codeText)) {
-            $docCode.AddFromString($codeText)
-        }
-    } else {
-        $comp = $project.VBComponents.Import($_.FullName)
-        if ($comp.Name -ne $_.BaseName) {
-            try {
-                $comp.Name = $_.BaseName
-            } catch {
-                Write-Host "  -> Warning: Could not rename to $($_.BaseName). It remains named $($comp.Name)" -ForegroundColor Yellow
-            }
-        }
-    }
-}
-
-# Import FRM files (which also auto-imports FRX if it exists)
-Write-Host "Importing forms from $formsPath..."
-Get-ChildItem -Path $formsPath -Filter "*.frm" | ForEach-Object {
-    Write-Host "  -> $($_.Name)"
     $comp = $project.VBComponents.Import($_.FullName)
-    # Forms usually retain their name from internal attributes, but we can enforce it just in case:
     $comp.Name = $_.BaseName
 }
+
+# Import FRM files — SKIPPED for macrixImposition: the .frm in forms/ is a
+# VB6-format form that CorelDRAW's VBE cannot load. The UserForm is instead
+# generated at runtime by mdlFormBuilder.BuildImpositionFormWithCode.
+Write-Host "Skipping .frm import (VB6-format form; mdlFormBuilder generates the UserForm at runtime)."
 
 Write-Host "Successfully synced source code into the CorelDRAW GMS project."
 Write-Host "Remember to press 'Save' inside the CorelDRAW Macro Editor to persist changes to the actual .gms file."

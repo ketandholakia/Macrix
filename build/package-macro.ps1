@@ -29,7 +29,7 @@ if (-not $entry) {
     exit 6
 }
 
-if (-not $MacroRoot) { $MacroRoot = $env:VITTIX_MACRO_ROOT }
+if (-not $MacroRoot) { $MacroRoot = $env:MACRIX_MACRO_ROOT }
 if (-not $MacroRoot) { $MacroRoot = Join-Path $repoRoot $reg.macroRoot }
 if (-not (Test-Path -LiteralPath $MacroRoot)) { throw "macro root not found: $MacroRoot" }
 

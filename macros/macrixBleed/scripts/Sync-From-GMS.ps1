@@ -1,6 +1,6 @@
 param(
     [string]$SourceRoot = (Join-Path $PSScriptRoot ".."),
-    [string]$ProjectName = "VittixSelectSame"
+    [string]$ProjectName = "macrixBleed"
 )
 
 $srcPath = Join-Path $SourceRoot "src"
@@ -50,6 +50,10 @@ foreach ($comp in $project.VBComponents) {
         Write-Host "Exporting Form: $($comp.Name) -> $exportPath"
         $comp.Export($exportPath)
         # Note: Exporting the .frm automatically exports the .frx next to it
+    } elseif ($comp.Type -eq 100 -and $comp.Name -eq "ThisMacroStorage") {
+        $exportPath = Join-Path $srcPath "$($comp.Name).cls"
+        Write-Host "Exporting Document: $($comp.Name) -> $exportPath"
+        $comp.Export($exportPath)
     }
 }
 

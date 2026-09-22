@@ -1,6 +1,6 @@
 param(
     [string]$SourceRoot = (Join-Path $PSScriptRoot ".."),
-    [string]$ProjectName = "VittixSelectSame"
+    [string]$ProjectName = "macrixBleed"
 )
 
 $srcPath = Join-Path $SourceRoot "src"
@@ -47,15 +47,56 @@ Write-Host "Importing modules from $srcPath..."
 Get-ChildItem -Path $srcPath -Filter "*.bas" | ForEach-Object {
     Write-Host "  -> $($_.Name)"
     $comp = $project.VBComponents.Import($_.FullName)
-    $comp.Name = $_.BaseName
+    if ($comp.Name -ne $_.BaseName) {
+        try {
+            $comp.Name = $_.BaseName
+        } catch {
+            Write-Host "  -> Warning: Could not rename to $($_.BaseName). It remains named $($comp.Name)" -ForegroundColor Yellow
+        }
+    }
 }
 
 # Import CLS files
 Write-Host "Importing class modules from $srcPath..."
 Get-ChildItem -Path $srcPath -Filter "*.cls" | ForEach-Object {
     Write-Host "  -> $($_.Name)"
-    $comp = $project.VBComponents.Import($_.FullName)
-    $comp.Name = $_.BaseName
+    if ($_.BaseName -eq "ThisMacroStorage") {
+        Write-Host "  -> Syncing ThisMacroStorage code..."
+        $docComp = $project.VBComponents.Item("ThisMacroStorage")
+        $docCode = $docComp.CodeModule
+        if ($docCode.CountOfLines -gt 0) {
+            $docCode.DeleteLines(1, $docCode.CountOfLines)
+        }
+        
+        # Read the file and strip the VBA class headers manually
+        $lines = Get-Content $_.FullName
+        $codeLines = @()
+        $inHeader = $true
+        foreach ($line in $lines) {
+            if ($inHeader) {
+                if ($line -notmatch "^VERSION " -and $line -notmatch "^BEGIN" -and $line -notmatch "^END" -and $line -notmatch "^Attribute " -and $line -notmatch "^\s*MultiUse\s*=") {
+                    $inHeader = $false
+                }
+            }
+            if (-not $inHeader) {
+                $codeLines += $line
+            }
+        }
+        
+        $codeText = $codeLines -join "`r`n"
+        if (-not [string]::IsNullOrWhiteSpace($codeText)) {
+            $docCode.AddFromString($codeText)
+        }
+    } else {
+        $comp = $project.VBComponents.Import($_.FullName)
+        if ($comp.Name -ne $_.BaseName) {
+            try {
+                $comp.Name = $_.BaseName
+            } catch {
+                Write-Host "  -> Warning: Could not rename to $($_.BaseName). It remains named $($comp.Name)" -ForegroundColor Yellow
+            }
+        }
+    }
 }
 
 # Import FRM files (which also auto-imports FRX if it exists)

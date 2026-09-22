@@ -1,11 +1,11 @@
 {
-  "schema": "vittix.macro-registry/v1",
+  "schema": "macrix.macro-registry/v1",
   "macroRoot": "macros",
   "notes": [
     "Macro sources live in this repository under macros/<dir> (migrated from the",
     "original checkout github.com/ketandholakia/Vittix-CDR-Macro, MIT).",
     "Each entry is a separate CorelDRAW VBA project with its own .gms file.",
-    "They are NOT modules of the Vittix project: several module names collide across",
+    "They are NOT modules of the Macrix project: several module names collide across",
     "macros (modSettings, modUnits, mdlFormBuilder), so they must stay separate projects.",
     "'entryPoints' are 'Module.Procedure' names callable from CorelDRAW.",
     "'project' must match the Global Macro Project name saved inside CorelDRAW exactly."
@@ -13,40 +13,40 @@
   "macros": [
     {
       "id": "select-same",
-      "display": "Vittix Select Same",
-      "project": "VittixSelectSame",
+      "display": "Macrix Select Same",
+      "project": "MacrixSelectSame",
       "importForms": true,
-      "dir": "VittixSelectSame",
+      "dir": "MacrixSelectSame",
       "entryPoints": [ "mdlMain.SelectSimilarObjects" ],
       "stability": "beta",
       "status": "active"
     },
     {
       "id": "bleed",
-      "display": "Vittix Bleed",
-      "project": "vittixBleed",
+      "display": "Macrix Bleed",
+      "project": "macrixBleed",
       "importForms": true,
-      "dir": "vittixBleed",
+      "dir": "macrixBleed",
       "entryPoints": [ "Bleeds.Start" ],
       "stability": "beta",
       "status": "active"
     },
     {
       "id": "dimension-tools",
-      "display": "Vittix Dimension Tools",
-      "project": "VittixDimensionTools",
+      "display": "Macrix Dimension Tools",
+      "project": "MacrixTools",
       "importForms": false,
-      "dir": "vittixdimension",
-      "entryPoints": [ "modMain.VittixDimension", "modMain.VittixDimensionTools_Create" ],
+      "dir": "macrixTools",
+      "entryPoints": [ "modMain.MacrixDimension", "modMain.MacrixTools_Create" ],
       "stability": "beta",
       "status": "active"
     },
     {
       "id": "imposition",
-      "display": "Vittix Imposition",
-      "project": "vittixImposition",
+      "display": "Macrix Imposition",
+      "project": "macrixImposition",
       "importForms": false,
-      "dir": "vittixImposition",
+      "dir": "macrixImposition",
       "entryPoints": [ "modImposition.RunImposition" ],
       "stability": "experimental",
       "status": "active"

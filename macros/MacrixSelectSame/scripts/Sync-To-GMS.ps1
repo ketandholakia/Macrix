@@ -1,6 +1,6 @@
 param(
     [string]$SourceRoot = (Join-Path $PSScriptRoot ".."),
-    [string]$ProjectName = "vittixImposition"
+    [string]$ProjectName = "MacrixSelectSame"
 )
 
 $srcPath = Join-Path $SourceRoot "src"
@@ -58,10 +58,14 @@ Get-ChildItem -Path $srcPath -Filter "*.cls" | ForEach-Object {
     $comp.Name = $_.BaseName
 }
 
-# Import FRM files — SKIPPED for vittixImposition: the .frm in forms/ is a
-# VB6-format form that CorelDRAW's VBE cannot load. The UserForm is instead
-# generated at runtime by mdlFormBuilder.BuildImpositionFormWithCode.
-Write-Host "Skipping .frm import (VB6-format form; mdlFormBuilder generates the UserForm at runtime)."
+# Import FRM files (which also auto-imports FRX if it exists)
+Write-Host "Importing forms from $formsPath..."
+Get-ChildItem -Path $formsPath -Filter "*.frm" | ForEach-Object {
+    Write-Host "  -> $($_.Name)"
+    $comp = $project.VBComponents.Import($_.FullName)
+    # Forms usually retain their name from internal attributes, but we can enforce it just in case:
+    $comp.Name = $_.BaseName
+}
 
 Write-Host "Successfully synced source code into the CorelDRAW GMS project."
 Write-Host "Remember to press 'Save' inside the CorelDRAW Macro Editor to persist changes to the actual .gms file."

@@ -1,4 +1,4 @@
-# Vittix CorelDRAW Macros
+# Macrix CorelDRAW Macros
 
 This repository contains a collection of custom VBA macros for CorelDRAW, developed to enhance workflow and automate tasks.
 
@@ -7,9 +7,9 @@ This repository contains a collection of custom VBA macros for CorelDRAW, develo
 To keep things organized and maintainable, each macro exists in its own isolated subfolder. This allows you to manage, sync, and develop multiple macros independently within the same repository.
 
 ```text
-vittixcdrMacro/
+macrixcdrMacro/
 │
-├── vittixdimension/       # Vittix Dimension Tools (Current Macro)
+├── macrixTools/       # Macrix Dimension Tools (Current Macro)
 │   ├── src/               # VBA source files (.bas, .cls)
 │   ├── forms/             # UserForm files (.frm, .frx)
 │   ├── scripts/           # Sync scripts specific to this macro
@@ -32,8 +32,8 @@ Each macro folder contains a `scripts` directory with two important PowerShell s
 
 ## Included Macros
 
-### 1. Vittix Dimension Tools (`/vittixdimension`)
+### 1. Macrix Dimension Tools (`/macrixTools`)
 A powerful, UI-driven dimensioning tool that automatically measures selected shapes and places formatted dimension labels (width, height, area, perimeter, and object count). Includes customizable padding, backgrounds, and a dynamic template engine for text formatting.
 
 ---
-*Developed by Ketan for the Vittix workflow.*
+*Developed by Ketan for the Macrix workflow.*

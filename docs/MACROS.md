@@ -25,7 +25,7 @@ projects, and their module names **collide** across macros:
 | `modSettings.bas` | Dimension Tools, Imposition |
 | `modUnits.bas` / `mdlUnits.bas` | Dimension Tools, Select Same |
 
-They therefore cannot be flattened into this repo's single `Vittix` project without a
+They therefore cannot be flattened into this repo's single `Macrix` project without a
 module-namespace plan (prefixing every module). The framework treats them as **N
 projects**, not as features of one project.
 
@@ -33,10 +33,10 @@ projects**, not as features of one project.
 
 | id | CorelDRAW project | folder | entry point(s) |
 | --- | --- | --- | --- |
-| `select-same` | `VittixSelectSame` | `VittixSelectSame` | `mdlMain.SelectSimilarObjects` |
-| `bleed` | `vittixBleed` | `vittixBleed` | `Bleeds.Start` |
-| `dimension-tools` | `VittixDimensionTools` | `vittixdimension` | `modMain.VittixDimension`, `modMain.VittixDimensionTools_Create` |
-| `imposition` | `vittixImposition` | `vittixImposition` | `modImposition.RunImposition` |
+| `select-same` | `MacrixSelectSame` | `MacrixSelectSame` | `mdlMain.SelectSimilarObjects` |
+| `bleed` | `macrixBleed` | `macrixBleed` | `Bleeds.Start` |
+| `dimension-tools` | `MacrixTools` | `macrixTools` | `modMain.MacrixDimension`, `modMain.MacrixTools_Create` |
+| `imposition` | `macrixImposition` | `macrixImposition` | `modImposition.RunImposition` |
 
 ## Macro root
 
@@ -47,7 +47,7 @@ including its uncommitted work. `macros/README.md`, `macros/LICENSE`,
 from that checkout for provenance and tooling.
 
 The macro root defaults to `macros` and can be overridden with
-`build/macros.ps1 -MacroRoot <path>` or the `VITTIX_MACRO_ROOT` environment
+`build/macros.ps1 -MacroRoot <path>` or the `MACRIX_MACRO_ROOT` environment
 variable (useful to point at a separate checkout).
 
 When the macro root is absent, `validate.ps1` prints an informational line (not a
@@ -85,20 +85,20 @@ is VB6-format and CorelDRAW's VBE cannot load it reliably).
 - **`mdlFormBuilder.bas` exists in three macros at three different revisions**
   (13.4 KB / 17.5 KB / 18.9 KB) — a shared module copy-pasted and diverged.
   Candidate for extraction into one shared module.
-- **`vittixdimension`'s `frmDimension` must not be imported from the repo `.frm`.** Its
+- **`macrixTools`'s `frmDimension` must not be imported from the repo `.frm`.** Its
   controls live in the binary `.frx`, and importing the `.frm` into CorelDRAW's VBE
   produces a control-less form — which makes the whole project fail to compile with
   "Method or data member not found". The form lives in the `.gms`; rebuild it with
-  `macros/vittixdimension/scripts/Build-Form.ps1` and keep `importForms: false`.
-- **`vittixImposition` sources are not importable as-is:** `ImpositionMacro.bas`,
+  `macros/macrixTools/scripts/Build-Form.ps1` and keep `importForms: false`.
+- **`macrixImposition` sources are not importable as-is:** `ImpositionMacro.bas`,
   `modImposition.bas` and `modSettings.bas` have **no `Attribute VB_Name`** (never
   exported from the VBE), and `mdlDebug.bas` declares `Attribute VB_Name =
   "mdlDebugLog"`, which does not match its file name. Importing them would create
   mis-named components. Surfaced by `validate.ps1 -Macro imposition`.
-- **`vittixImposition` also defines `RunImposition` (and `BuildPageOrder`,
+- **`macrixImposition` also defines `RunImposition` (and `BuildPageOrder`,
   `PlacePageInCell`, `DrawCropMarks`) in both `ImpositionMacro.bas` and
   `modImposition.bas`** — likely one module is a superseded copy of the other.
-- **Source of truth moved here.** The original `vittixcdrMacro` checkout is now
+- **Source of truth moved here.** The original `macrixcdrMacro` checkout is now
   marked archived **locally** (`ARCHIVED.md` + a README banner, commit `0048ff4`);
   its uncommitted work was deliberately preserved there. Its public remote
   `ketandholakia/Vittix-CDR-Macro` (visibility: public) is **not yet archived**.

@@ -71,46 +71,46 @@ End Sub
 
 Private Sub PersistSettings(ByRef settings As VDT_Settings)
     
-    SaveSetting "Vittix", "DimensionTools", "Unit", CStr(settings.unit)
-    SaveSetting "Vittix", "DimensionTools", "Decimals", CStr(settings.decimals)
-    SaveSetting "Vittix", "DimensionTools", "Position", settings.Position
-    SaveSetting "Vittix", "DimensionTools", "TextColor", settings.TextColor
-    SaveSetting "Vittix", "DimensionTools", "TextWidthPercent", CStr(settings.TextWidthPercent)
-    SaveSetting "Vittix", "DimensionTools", "Gap", CStr(settings.Gap)
-    SaveSetting "Vittix", "DimensionTools", "Padding", CStr(settings.Padding)
-    SaveSetting "Vittix", "DimensionTools", "CornerRadius", CStr(settings.CornerRadius)
-    SaveSetting "Vittix", "DimensionTools", "StyleName", settings.styleName
-    SaveSetting "Vittix", "DimensionTools", "Template", settings.Template
-    SaveSetting "Vittix", "DimensionTools", "ShowWidth", CStr(settings.ShowWidth)
-    SaveSetting "Vittix", "DimensionTools", "ShowHeight", CStr(settings.ShowHeight)
-    SaveSetting "Vittix", "DimensionTools", "ShowArea", CStr(settings.ShowArea)
-    SaveSetting "Vittix", "DimensionTools", "ShowPerimeter", CStr(settings.ShowPerimeter)
-    SaveSetting "Vittix", "DimensionTools", "ShowObjectCount", CStr(settings.ShowObjectCount)
-    SaveSetting "Vittix", "DimensionTools", "BackgroundBox", CStr(settings.BackgroundBox)
-    SaveSetting "Vittix", "DimensionTools", "RoundedBackground", CStr(settings.RoundedBackground)
-    SaveSetting "Vittix", "DimensionTools", "CreateLayer", CStr(settings.CreateLayer)
+    SaveSetting "Macrix", "DimensionTools", "Unit", CStr(settings.unit)
+    SaveSetting "Macrix", "DimensionTools", "Decimals", CStr(settings.decimals)
+    SaveSetting "Macrix", "DimensionTools", "Position", settings.Position
+    SaveSetting "Macrix", "DimensionTools", "TextColor", settings.TextColor
+    SaveSetting "Macrix", "DimensionTools", "TextWidthPercent", CStr(settings.TextWidthPercent)
+    SaveSetting "Macrix", "DimensionTools", "Gap", CStr(settings.Gap)
+    SaveSetting "Macrix", "DimensionTools", "Padding", CStr(settings.Padding)
+    SaveSetting "Macrix", "DimensionTools", "CornerRadius", CStr(settings.CornerRadius)
+    SaveSetting "Macrix", "DimensionTools", "StyleName", settings.styleName
+    SaveSetting "Macrix", "DimensionTools", "Template", settings.Template
+    SaveSetting "Macrix", "DimensionTools", "ShowWidth", CStr(settings.ShowWidth)
+    SaveSetting "Macrix", "DimensionTools", "ShowHeight", CStr(settings.ShowHeight)
+    SaveSetting "Macrix", "DimensionTools", "ShowArea", CStr(settings.ShowArea)
+    SaveSetting "Macrix", "DimensionTools", "ShowPerimeter", CStr(settings.ShowPerimeter)
+    SaveSetting "Macrix", "DimensionTools", "ShowObjectCount", CStr(settings.ShowObjectCount)
+    SaveSetting "Macrix", "DimensionTools", "BackgroundBox", CStr(settings.BackgroundBox)
+    SaveSetting "Macrix", "DimensionTools", "RoundedBackground", CStr(settings.RoundedBackground)
+    SaveSetting "Macrix", "DimensionTools", "CreateLayer", CStr(settings.CreateLayer)
 End Sub
 
 Private Sub LoadPersistedSettings(ByRef settings As VDT_Settings)
     On Error Resume Next
-    settings.unit = CLng(GetSetting("Vittix", "DimensionTools", "Unit", CStr(settings.unit)))
-    settings.decimals = CInt(GetSetting("Vittix", "DimensionTools", "Decimals", CStr(settings.decimals)))
-    settings.Position = GetSetting("Vittix", "DimensionTools", "Position", settings.Position)
-    settings.TextColor = GetSetting("Vittix", "DimensionTools", "TextColor", settings.TextColor)
-    settings.TextWidthPercent = CDbl(GetSetting("Vittix", "DimensionTools", "TextWidthPercent", CStr(settings.TextWidthPercent)))
-    settings.Gap = CDbl(GetSetting("Vittix", "DimensionTools", "Gap", CStr(settings.Gap)))
-    settings.Padding = CDbl(GetSetting("Vittix", "DimensionTools", "Padding", CStr(settings.Padding)))
-    settings.CornerRadius = CDbl(GetSetting("Vittix", "DimensionTools", "CornerRadius", CStr(settings.CornerRadius)))
-    settings.styleName = GetSetting("Vittix", "DimensionTools", "StyleName", settings.styleName)
-    settings.Template = GetSetting("Vittix", "DimensionTools", "Template", settings.Template)
-    settings.ShowWidth = CBool(GetSetting("Vittix", "DimensionTools", "ShowWidth", CStr(settings.ShowWidth)))
-    settings.ShowHeight = CBool(GetSetting("Vittix", "DimensionTools", "ShowHeight", CStr(settings.ShowHeight)))
-    settings.ShowArea = CBool(GetSetting("Vittix", "DimensionTools", "ShowArea", CStr(settings.ShowArea)))
-    settings.ShowPerimeter = CBool(GetSetting("Vittix", "DimensionTools", "ShowPerimeter", CStr(settings.ShowPerimeter)))
-    settings.ShowObjectCount = CBool(GetSetting("Vittix", "DimensionTools", "ShowObjectCount", CStr(settings.ShowObjectCount)))
-    settings.BackgroundBox = CBool(GetSetting("Vittix", "DimensionTools", "BackgroundBox", CStr(settings.BackgroundBox)))
-    settings.RoundedBackground = CBool(GetSetting("Vittix", "DimensionTools", "RoundedBackground", CStr(settings.RoundedBackground)))
-    settings.CreateLayer = CBool(GetSetting("Vittix", "DimensionTools", "CreateLayer", CStr(settings.CreateLayer)))
+    settings.unit = CLng(GetSetting("Macrix", "DimensionTools", "Unit", CStr(settings.unit)))
+    settings.decimals = CInt(GetSetting("Macrix", "DimensionTools", "Decimals", CStr(settings.decimals)))
+    settings.Position = GetSetting("Macrix", "DimensionTools", "Position", settings.Position)
+    settings.TextColor = GetSetting("Macrix", "DimensionTools", "TextColor", settings.TextColor)
+    settings.TextWidthPercent = CDbl(GetSetting("Macrix", "DimensionTools", "TextWidthPercent", CStr(settings.TextWidthPercent)))
+    settings.Gap = CDbl(GetSetting("Macrix", "DimensionTools", "Gap", CStr(settings.Gap)))
+    settings.Padding = CDbl(GetSetting("Macrix", "DimensionTools", "Padding", CStr(settings.Padding)))
+    settings.CornerRadius = CDbl(GetSetting("Macrix", "DimensionTools", "CornerRadius", CStr(settings.CornerRadius)))
+    settings.styleName = GetSetting("Macrix", "DimensionTools", "StyleName", settings.styleName)
+    settings.Template = GetSetting("Macrix", "DimensionTools", "Template", settings.Template)
+    settings.ShowWidth = CBool(GetSetting("Macrix", "DimensionTools", "ShowWidth", CStr(settings.ShowWidth)))
+    settings.ShowHeight = CBool(GetSetting("Macrix", "DimensionTools", "ShowHeight", CStr(settings.ShowHeight)))
+    settings.ShowArea = CBool(GetSetting("Macrix", "DimensionTools", "ShowArea", CStr(settings.ShowArea)))
+    settings.ShowPerimeter = CBool(GetSetting("Macrix", "DimensionTools", "ShowPerimeter", CStr(settings.ShowPerimeter)))
+    settings.ShowObjectCount = CBool(GetSetting("Macrix", "DimensionTools", "ShowObjectCount", CStr(settings.ShowObjectCount)))
+    settings.BackgroundBox = CBool(GetSetting("Macrix", "DimensionTools", "BackgroundBox", CStr(settings.BackgroundBox)))
+    settings.RoundedBackground = CBool(GetSetting("Macrix", "DimensionTools", "RoundedBackground", CStr(settings.RoundedBackground)))
+    settings.CreateLayer = CBool(GetSetting("Macrix", "DimensionTools", "CreateLayer", CStr(settings.CreateLayer)))
 End Sub
 
 Public Sub ApplySettingsToForm(frm As Object)

@@ -71,7 +71,7 @@ if ($Macro) {
             }
             else {
                 $macroRootV = $mregV.macroRoot
-                if ($env:VITTIX_MACRO_ROOT) { $macroRootV = $env:VITTIX_MACRO_ROOT }
+                if ($env:MACRIX_MACRO_ROOT) { $macroRootV = $env:MACRIX_MACRO_ROOT }
                 if (-not [System.IO.Path]::IsPathRooted($macroRootV)) { $macroRootV = Join-Path $repoRootV $macroRootV }
                 $macroSrcV = Join-Path (Join-Path $macroRootV $mentry.dir) 'src'
                 if (Test-Path -LiteralPath $macroSrcV) {
@@ -219,7 +219,7 @@ if (Test-Path -LiteralPath $macroRegFile) {
     try {
         $mreg = Get-Content -Raw -LiteralPath $macroRegFile -Encoding UTF8 | ConvertFrom-Json
         $macroRoot = $mreg.macroRoot
-        if ($env:VITTIX_MACRO_ROOT) { $macroRoot = $env:VITTIX_MACRO_ROOT }
+        if ($env:MACRIX_MACRO_ROOT) { $macroRoot = $env:MACRIX_MACRO_ROOT }
         if (-not [System.IO.Path]::IsPathRooted($macroRoot)) {
             $macroRoot = Join-Path $repoRootForMacros $macroRoot
         }

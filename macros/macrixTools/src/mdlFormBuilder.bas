@@ -1,6 +1,6 @@
 Attribute VB_Name = "mdlFormBuilder"
 '==============================================================
-' mdlFormBuilder (VittixDimensionTools)
+' mdlFormBuilder (MacrixTools)
 '
 ' Builds frmDimension as a real MSForms VBA UserForm at
 ' runtime via the VBE Extensibility model. This replaces importing
@@ -36,7 +36,7 @@ Public Sub BuildDimensionFormWithCode()
 
     ' 3. Configure the form itself
     With newFormComp.Properties
-        .Item("Caption").Value = "Vittix Dimension"
+        .Item("Caption").Value = "Macrix Dimension"
         .Item("Width").Value = 320
         .Item("Height").Value = 520
         .Item("StartUpPosition").Value = 1 ' CenterOwner
@@ -224,7 +224,7 @@ Private Sub InjectCodeBehind(ByVal codeMod As Object)
     s = s & "    On Error GoTo ErrHandler" & vbCrLf
     s = s & "    ReadSettingsFromForm Me, gSettings" & vbCrLf
     s = s & "    SaveSettings" & vbCrLf
-    s = s & "    VittixDimensionTools_Create" & vbCrLf
+    s = s & "    MacrixTools_Create" & vbCrLf
     s = s & "    Unload Me" & vbCrLf
     s = s & "    Exit Sub" & vbCrLf
     s = s & "ErrHandler:" & vbCrLf

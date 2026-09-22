@@ -1,4 +1,4 @@
-# Vittix Dimension Tools
+# Macrix Dimension Tools
 
 CorelDRAW 2021 VBA add-in scaffold for production-style dimension labels.
 

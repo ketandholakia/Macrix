@@ -1,5 +1,5 @@
 ; ============================================================================
-;  Vittix CorelDRAW Macro Suite — Installer
+;  Macrix CorelDRAW Macro Suite — Installer
 ; ============================================================================
 ;  Built with Inno Setup 6.x (+ ISPP, bundled by default).
 ;
@@ -9,15 +9,15 @@
 ;    3. [Code]
 [Setup]
 AppId={{B3C1E9C4-7B77-4B1E-9A6F-1D3B6D8F9C10}}
-AppName=Vittix CorelDRAW Macro Suite
+AppName=Macrix CorelDRAW Macro Suite
 AppVersion=1.0.0
-AppPublisher=Vittix
+AppPublisher=Macrix
 AppPublisherURL=https://github.com/ketandholakia/Vittix-CDR-Macro
-DefaultDirName={localappdata}\Vittix\CDRMacros
-DefaultGroupName=Vittix CDR Macros
+DefaultDirName={localappdata}\Macrix\CDRMacros
+DefaultGroupName=Macrix CDR Macros
 DisableProgramGroupPage=yes
 OutputDir=..\dist
-OutputBaseFilename=VittixCDRMacros-Setup-1.0.0
+OutputBaseFilename=MacrixCDRMacros-Setup-1.0.0
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
@@ -28,40 +28,40 @@ ArchitecturesInstallIn64BitMode=x64compatible
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Components]
-Name: "macro"; Description: "Vittix Macros"; Types: full custom; Flags: fixed
-Name: "macro\selectsame"; Description: "VittixSelectSame - select shapes with matching properties"; Types: full custom
-Name: "macro\bleed"; Description: "vittixBleed - bleed / crop-mark expansion"; Types: full custom
-Name: "macro\dimension"; Description: "VittixDimensionTools - dimension labeling"; Types: full custom
-Name: "macro\imposition"; Description: "vittixImposition - imposition/signature layout"; Types: full custom
+Name: "macro"; Description: "Macrix Macros"; Types: full custom; Flags: fixed
+Name: "macro\selectsame"; Description: "MacrixSelectSame - select shapes with matching properties"; Types: full custom
+Name: "macro\bleed"; Description: "macrixBleed - bleed / crop-mark expansion"; Types: full custom
+Name: "macro\dimension"; Description: "MacrixTools - dimension labeling"; Types: full custom
+Name: "macro\imposition"; Description: "macrixImposition - imposition/signature layout"; Types: full custom
 
 [Types]
 Name: "full"; Description: "Install all macros"
 Name: "custom"; Description: "Choose which macros to install"; Flags: iscustom
 
 [Files]
-Source: "..\VittixSelectSame\src\*"; DestDir: "{app}\VittixSelectSame\src"; Components: macro\selectsame; Flags: recursesubdirs ignoreversion
-Source: "..\VittixSelectSame\forms\*"; DestDir: "{app}\VittixSelectSame\forms"; Components: macro\selectsame; Flags: recursesubdirs ignoreversion
-Source: "..\VittixSelectSame\scripts\Sync-To-GMS.ps1"; DestDir: "{app}\VittixSelectSame\scripts"; Components: macro\selectsame; Flags: ignoreversion
-Source: "..\VittixSelectSame\scripts\Sync-From-GMS.ps1"; DestDir: "{app}\VittixSelectSame\scripts"; Components: macro\selectsame; Flags: ignoreversion
+Source: "..\MacrixSelectSame\src\*"; DestDir: "{app}\MacrixSelectSame\src"; Components: macro\selectsame; Flags: recursesubdirs ignoreversion
+Source: "..\MacrixSelectSame\forms\*"; DestDir: "{app}\MacrixSelectSame\forms"; Components: macro\selectsame; Flags: recursesubdirs ignoreversion
+Source: "..\MacrixSelectSame\scripts\Sync-To-GMS.ps1"; DestDir: "{app}\MacrixSelectSame\scripts"; Components: macro\selectsame; Flags: ignoreversion
+Source: "..\MacrixSelectSame\scripts\Sync-From-GMS.ps1"; DestDir: "{app}\MacrixSelectSame\scripts"; Components: macro\selectsame; Flags: ignoreversion
 
-Source: "..\vittixBleed\src\*"; DestDir: "{app}\vittixBleed\src"; Components: macro\bleed; Flags: recursesubdirs ignoreversion
-Source: "..\vittixBleed\forms\*"; DestDir: "{app}\vittixBleed\forms"; Components: macro\bleed; Flags: recursesubdirs ignoreversion
-Source: "..\vittixBleed\scripts\Sync-To-GMS.ps1"; DestDir: "{app}\vittixBleed\scripts"; Components: macro\bleed; Flags: ignoreversion
-Source: "..\vittixBleed\scripts\Sync-From-GMS.ps1"; DestDir: "{app}\vittixBleed\scripts"; Components: macro\bleed; Flags: ignoreversion
+Source: "..\macrixBleed\src\*"; DestDir: "{app}\macrixBleed\src"; Components: macro\bleed; Flags: recursesubdirs ignoreversion
+Source: "..\macrixBleed\forms\*"; DestDir: "{app}\macrixBleed\forms"; Components: macro\bleed; Flags: recursesubdirs ignoreversion
+Source: "..\macrixBleed\scripts\Sync-To-GMS.ps1"; DestDir: "{app}\macrixBleed\scripts"; Components: macro\bleed; Flags: ignoreversion
+Source: "..\macrixBleed\scripts\Sync-From-GMS.ps1"; DestDir: "{app}\macrixBleed\scripts"; Components: macro\bleed; Flags: ignoreversion
 
-Source: "..\vittixdimension\src\*"; DestDir: "{app}\vittixdimension\src"; Components: macro\dimension; Flags: recursesubdirs ignoreversion
-Source: "..\vittixdimension\forms\*"; DestDir: "{app}\vittixdimension\forms"; Components: macro\dimension; Flags: recursesubdirs ignoreversion
-Source: "..\vittixdimension\scripts\Sync-From-GMS.ps1"; DestDir: "{app}\vittixdimension\scripts"; Components: macro\dimension; Flags: ignoreversion
-Source: "..\vittixdimension\scripts\Sync-To-GMS.ps1"; DestDir: "{app}\vittixdimension\scripts"; Components: macro\dimension; Flags: ignoreversion
+Source: "..\macrixTools\src\*"; DestDir: "{app}\macrixTools\src"; Components: macro\dimension; Flags: recursesubdirs ignoreversion
+Source: "..\macrixTools\forms\*"; DestDir: "{app}\macrixTools\forms"; Components: macro\dimension; Flags: recursesubdirs ignoreversion
+Source: "..\macrixTools\scripts\Sync-From-GMS.ps1"; DestDir: "{app}\macrixTools\scripts"; Components: macro\dimension; Flags: ignoreversion
+Source: "..\macrixTools\scripts\Sync-To-GMS.ps1"; DestDir: "{app}\macrixTools\scripts"; Components: macro\dimension; Flags: ignoreversion
 
-Source: "..\vittixImposition\src\*"; DestDir: "{app}\vittixImposition\src"; Components: macro\imposition; Flags: recursesubdirs ignoreversion
-Source: "..\vittixImposition\forms\*"; DestDir: "{app}\vittixImposition\forms"; Components: macro\imposition; Flags: recursesubdirs ignoreversion
-Source: "..\vittixImposition\scripts\Sync-To-GMS.ps1"; DestDir: "{app}\vittixImposition\scripts"; Components: macro\imposition; Flags: ignoreversion
-Source: "..\vittixImposition\scripts\Sync-From-GMS.ps1"; DestDir: "{app}\vittixImposition\scripts"; Components: macro\imposition; Flags: ignoreversion
+Source: "..\macrixImposition\src\*"; DestDir: "{app}\macrixImposition\src"; Components: macro\imposition; Flags: recursesubdirs ignoreversion
+Source: "..\macrixImposition\forms\*"; DestDir: "{app}\macrixImposition\forms"; Components: macro\imposition; Flags: recursesubdirs ignoreversion
+Source: "..\macrixImposition\scripts\Sync-To-GMS.ps1"; DestDir: "{app}\macrixImposition\scripts"; Components: macro\imposition; Flags: ignoreversion
+Source: "..\macrixImposition\scripts\Sync-From-GMS.ps1"; DestDir: "{app}\macrixImposition\scripts"; Components: macro\imposition; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\Vittix CDR Macros - Source Folder"; Filename: "{app}"
-Name: "{group}\Uninstall Vittix CDR Macros"; Filename: "{uninstallexe}"
+Name: "{group}\Macrix CDR Macros - Source Folder"; Filename: "{app}"
+Name: "{group}\Uninstall Macrix CDR Macros"; Filename: "{uninstallexe}"
 
 [Code]
 // ==========================================================================
@@ -69,7 +69,7 @@ Name: "{group}\Uninstall Vittix CDR Macros"; Filename: "{uninstallexe}"
 // One record per macro: Component name (matches [Components] above),
 // friendly Global Macro Project name (must match exactly what you name the
 // saved GMS project inside CorelDRAW), and the sync script path relative to
-// {app} (e.g. 'vittixBleed\scripts\Sync-To-GMS.ps1').
+// {app} (e.g. 'macrixBleed\scripts\Sync-To-GMS.ps1').
 //
 // ADD NEW MACROS BY ADDING ONE LINE TO SetArrayLength / the assignments below.
 // ==========================================================================
@@ -88,27 +88,27 @@ begin
   SetArrayLength(MacroSyncScripts, MacroCount);
 
   MacroComponentNames[0] := 'macro\selectsame';
-  MacroProjectNames[0]   := 'VittixSelectSame';
-  MacroSyncScripts[0]    := 'VittixSelectSame\scripts\Sync-To-GMS.ps1';
+  MacroProjectNames[0]   := 'MacrixSelectSame';
+  MacroSyncScripts[0]    := 'MacrixSelectSame\scripts\Sync-To-GMS.ps1';
 
   MacroComponentNames[1] := 'macro\bleed';
-  MacroProjectNames[1]   := 'vittixBleed';
-  MacroSyncScripts[1]    := 'vittixBleed\scripts\Sync-To-GMS.ps1';
+  MacroProjectNames[1]   := 'macrixBleed';
+  MacroSyncScripts[1]    := 'macrixBleed\scripts\Sync-To-GMS.ps1';
 
   MacroComponentNames[2]   := 'macro\dimension';
-  MacroProjectNames[2]   := 'VittixDimensionTools';
-  MacroSyncScripts[2]   := 'vittixdimension\scripts\Sync-To-GMS.ps1';
+  MacroProjectNames[2]   := 'MacrixTools';
+  MacroSyncScripts[2]   := 'macrixTools\scripts\Sync-To-GMS.ps1';
 
   MacroComponentNames[3]   := 'macro\imposition';
-  MacroProjectNames[3]   := 'vittixImposition';
-  MacroSyncScripts[3]   := 'vittixImposition\scripts\Sync-To-GMS.ps1';
+  MacroProjectNames[3]   := 'macrixImposition';
+  MacroSyncScripts[3]   := 'macrixImposition\scripts\Sync-To-GMS.ps1';
 end;
 
 function MacroScriptsFolder(Index: Integer): String;
 var
   Path: String;
 begin
-  // MacroSyncScripts holds a path relative to {app} (e.g. 'vittixBleed\scripts\Sync-To-GMS.ps1').
+  // MacroSyncScripts holds a path relative to {app} (e.g. 'macrixBleed\scripts\Sync-To-GMS.ps1').
   // ExtractFilePath returns the folder with a trailing separator; strip it so the
   // path can be concatenated cleanly with following text.
   Path := ExpandConstant('{app}') + '\' + ExtractFilePath(MacroSyncScripts[Index]);

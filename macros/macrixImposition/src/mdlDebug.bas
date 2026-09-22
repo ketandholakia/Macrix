@@ -13,7 +13,7 @@ Sub DebugBuildForm()
     Err.Clear
     Dim vbp As Object
     For Each vbp In Application.VBE.VBProjects
-        If vbp.Name = "vittixImposition" Then Set p = vbp
+        If vbp.Name = "macrixImposition" Then Set p = vbp
     Next vbp
     Print #f, "target found: " & (Not p Is Nothing)
     Err.Clear

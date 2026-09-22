@@ -3,14 +3,14 @@ rem ============================================================================
 rem sync_gms_modules.bat
 rem ------------------------------------------------------------------------------
 rem Copies VBA module files (.bas and .frm) from the repository's src\ directory
-rem into the CorelDRAW GMS folder where Vittix.gms resides, staging them for
-rem import into the live Vittix.gms project via the CorelDRAW VBA editor.
+rem into the CorelDRAW GMS folder where Macrix.gms resides, staging them for
+rem import into the live Macrix.gms project via the CorelDRAW VBA editor.
 rem
 rem Usage:
 rem   sync_gms_modules.bat [gms_folder_path]
 rem
 rem   If no argument is given the script auto-detects the CorelDRAW GMS folder.
-rem   You can also override detection by setting the VITTIX_GMS_DIR environment
+rem   You can also override detection by setting the MACRIX_GMS_DIR environment
 rem   variable.  A command-line argument always takes precedence.
 rem
 rem Exit codes:
@@ -30,7 +30,7 @@ if not "%~1"=="" (
     set "GMS_DIR=%~1"
 )
 if "%GMS_DIR%"=="" (
-    if defined VITTIX_GMS_DIR set "GMS_DIR=%VITTIX_GMS_DIR%"
+    if defined MACRIX_GMS_DIR set "GMS_DIR=%MACRIX_GMS_DIR%"
 )
 
 rem --- Auto-detect the CorelDRAW GMS folder if still unset ---
@@ -55,7 +55,7 @@ if "%GMS_DIR%"=="" (
     echo.
     echo Fix this by either:
     echo   1. Passing the GMS path as an argument:  %~nx0 "C:\path\to\GMS"
-    echo   2. Setting the VITTIX_GMS_DIR environment variable to the GMS path.
+    echo   2. Setting the MACRIX_GMS_DIR environment variable to the GMS path.
     exit /b 2
 )
 
@@ -116,12 +116,12 @@ if !COPY_FAIL! gtr 0 (
     echo WARNING: %COPY_FAIL% file^(s^) failed to copy.
 )
 
-rem --- Check if Vittix.gms exists in the target folder ---
-if exist "%GMS_DIR%\vittix.gms" (
+rem --- Check if Macrix.gms exists in the target folder ---
+if exist "%GMS_DIR%\macrix.gms" (
     echo.
-    echo NOTE: vittix.gms was found in the GMS folder.
+    echo NOTE: macrix.gms was found in the GMS folder.
     echo   To import these modules into the live project, open CorelDRAW,
-    echo   open the VBA editor ^(Alt+F11^), right-click the Vittix macro project,
+    echo   open the VBA editor ^(Alt+F11^), right-click the Macrix macro project,
     echo   and use File ^> Import File... for each .bas file listed above.
 )
 

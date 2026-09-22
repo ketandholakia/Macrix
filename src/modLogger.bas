@@ -50,5 +50,5 @@ Private Sub p_openFile()
     modPathManager.PF_EnsureDir modPathManager.PF_GetUserDataDir()
     m_LogFileHandle = FreeFile
     Open modPathManager.PF_Join( _
-        modPathManager.PF_GetUserDataDir(), "vittix.log") For Append As #m_LogFileHandle
+        modPathManager.PF_GetUserDataDir(), "macrix.log") For Append As #m_LogFileHandle
 End Sub

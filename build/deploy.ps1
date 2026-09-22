@@ -92,7 +92,7 @@ if ($isMacro) {
         exit 6
     }
     $macroRoot = $mreg.macroRoot
-    if ($env:VITTIX_MACRO_ROOT) { $macroRoot = $env:VITTIX_MACRO_ROOT }
+    if ($env:MACRIX_MACRO_ROOT) { $macroRoot = $env:MACRIX_MACRO_ROOT }
     if (-not [System.IO.Path]::IsPathRooted($macroRoot)) { $macroRoot = Join-Path $repoRoot $macroRoot }
     $mdir     = Join-Path $macroRoot $macroEntry.dir
     $srcDir   = Join-Path $mdir 'src'
@@ -101,7 +101,7 @@ if ($isMacro) {
     if ($macroEntry.PSObject.Properties.Name -contains 'importForms') { $importForms = [bool]$macroEntry.importForms }
 }
 elseif (-not $PSBoundParameters.ContainsKey('Project')) {
-    $Project = 'vittix.gms'
+    $Project = 'macrix.gms'
 }
 
 if (-not $GmsDir) { $GmsDir = Get-GmsDir }
@@ -141,7 +141,7 @@ if (-not $SkipValidate -and -not $List) {
 
 # ---------------------------------------------------------------- staging (bootstrap path)
 if ($Stage) {
-    $staging = Join-Path $env:APPDATA 'Vittix\staging'
+    $staging = Join-Path $env:APPDATA 'Macrix\staging'
     New-Item -ItemType Directory -Path $staging -Force | Out-Null
     $modules | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination $staging -Force }
     Write-Host "`nStaged $($modules.Count) module(s) -> $staging"

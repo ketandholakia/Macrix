@@ -9,7 +9,7 @@ Option Explicit
 ' Depends on: nothing external.
 ' CorelDRAW dependency: none.
 
-Public Const PF_AppFolder As String = "Vittix"
+Public Const PF_AppFolder As String = "Macrix"
 
 Public Function PF_GetUserDataDir() As String
     Dim base As String

@@ -1,6 +1,6 @@
 param(
     [string]$SourceRoot = (Join-Path $PSScriptRoot ".."),
-    [string]$ProjectName = "vittixImposition"
+    [string]$ProjectName = "MacrixSelectSame"
 )
 
 $srcPath = Join-Path $SourceRoot "src"
