@@ -1,5 +1,9 @@
 # How to add a new macro (feature)
 
+> **Scope:** this describes adding a **feature to the shared scaffold project**
+> (`src/`), not to the shipped macros under `macros/`. To work on a shipped macro,
+> see [`MACROS.md`](MACROS.md).
+
 The fast path. Full detail in §26 of the master prompt.
 
 1. **Decide the feature id** — a kebab-case slug, e.g. `rounded-corners`. Keep this stable; it is your

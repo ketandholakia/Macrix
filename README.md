@@ -1,90 +1,80 @@
-# Vittix CorelDRAW VBA Development System
+# Vittix CorelDRAW Macro Development
 
-A small, structured software platform for developing, testing, packaging, installing, maintaining, and
-extending CorelDRAW VBA automation — not a grab-bag of unrelated `.bas` macros.
+Development repository for a set of **CorelDRAW VBA macros**. Each macro is its own
+CorelDRAW VBA project (its own `.gms`); this repository holds the macro sources, the
+registry that tracks them, and the tooling to lint, package and sync them into
+CorelDRAW.
 
-## Status
+## Macros
 
-| Item | Status |
-| --- | --- |
-| Architecture | Scaffolded (v1) — see `docs/ARCHITECTURE.md` |
-| Core services | Stubs + safe-run pattern in place |
-| Pure-logic modules | Run via `modTestRunner` harness |
-| Corel-dependent code | **Not validated** — requires a live CorelDRAW for characterization tests |
-| CI | Static checks only (`build/validate.ps1`); manual checks for COM behavior |
+| Macro | CorelDRAW project | Sources | Entry point(s) | Forms |
+| --- | --- | --- | --- | --- |
+| Vittix Select Same | `VittixSelectSame` | `macros/VittixSelectSame/` | `mdlMain.SelectSimilarObjects` | imported |
+| Vittix Bleed | `vittixBleed` | `macros/vittixBleed/` | `Bleeds.Start` | imported |
+| Vittix Dimension Tools | `VittixDimensionTools` | `macros/vittixdimension/` | `modMain.VittixDimension`, `modMain.VittixDimensionTools_Create` | built at runtime |
+| Vittix Imposition | `vittixImposition` | `macros/vittixImposition/` | `modImposition.RunImposition` | built at runtime |
 
-## Repository layout
+The macros are four separate VBA projects whose module names collide, so they stay
+as four projects rather than being flattened into one. Per-macro details and known
+issues: [`docs/MACROS.md`](docs/MACROS.md).
 
-```
-src/
-  modBootstrap.bas                Entry points & feature wiring
-  modFeatureRegistry.bas          Feature/module registration (§12)
-  modConfig.bas · modLogger.bas   Settings · diagnostics (§8, §9)
-  modErrorHandler.bas             Safety + failure circuit breaker (§10, §46)
-  modVersion.bas · modEnvironment.bas
-  modPathManager.bas              Path handling
-  modComLifecycle.bas             COM reference release discipline (§37)
-  modBinding.bas · modReferenceRegistry.bas · modTrust.bas   (§38, §42)
-  modAppServices.bas … core framework services
-  modCorelCompatibility.bas · modVersionDetect.bas
-  modDialogHelper.bas · modUiUtilities.bas · frmAbout.frm
-  feat_*.bas                      End-user features
-  pl_*.bas                        Pure-logic, Corel-free modules (§40)
-  modTestRunner.bas               Lightweight test harness
-build/
-    validate.ps1   Static checks (naming, structure, registry drift, paths)
-    new-feature.ps1        Scaffolds a new registered feature module
-    deploy.ps1     Push/pull src <-> a CorelDRAW .gms (per-macro via -Macro; dry-run default)
-    macros.ps1     Inventory/verify the macros registered in macros\registry.json
-    package-macro.ps1   Packages one registered macro into build\_out\macros\<id>
-    templates/feat_template.bas   Safe-run feature skeleton
-    package.ps1    Assembles a versioned source package for import/distribution
-    sync_gms_modules.bat   Copies .bas/.frm modules into the CorelDRAW GMS folder
-    installer/INNO_SETUP_TEMPLATE.iss
-tools/dev-import/modDevImport.bas   In-app bootstrap importer (runs inside CorelDRAW)
-macros/registry.json              Declarative list of the managed CorelDRAW macro projects
-macros/<macro>/{src,forms,scripts}  Macros themselves (migrated; one folder per .gms project)
-.github/workflows/validate.yml   CI: runs build/validate.ps1 on push/PR
-docs/DEPLOYMENT.md               How source reaches a CorelDRAW .gms project
-docs/MACROS.md                   The macros this framework manages + their layout
-docs/
-    ARCHITECTURE.md  CONVENTIONS.md  ADDING_A_MACRO.md  TESTING.md  RELEASE_CHECKLIST.md
-```
-
-## Development workflow
-
-The end-to-end macro lifecycle (scaffold → implement → validate → test → package
-→ deploy → release) is in `docs/WORKFLOW.md`. The short version:
+## Everyday commands
 
 ```powershell
-# 1. Scaffold a new macro (creates src/feat_MyTool.bas and registers it)
-powershell -File build/new-feature.ps1 -Name my-tool -Display "My Tool" -Stability Beta -Register
+# inventory / verify the registry against the sources
+powershell -File build/macros.ps1 -Verify
 
-# 2. Static gate — must report 0 errors
-powershell -File build/validate.ps1
+# lint one macro (scoped, so one macro cannot block another)
+powershell -File build/validate.ps1 -Macro dimension-tools
+
+# package one macro
+powershell -File build/package-macro.ps1 -Macro dimension-tools
+
+# sync with CorelDRAW (dry run by default; -Apply to write)
+powershell -File build/deploy.ps1 -Macro dimension-tools               # plan a push
+powershell -File build/deploy.ps1 -Macro dimension-tools -Apply        # source -> .gms
+powershell -File build/deploy.ps1 -Macro dimension-tools -Pull -Apply  # .gms -> source
 ```
 
-`build/validate.ps1` also fails on **registry drift**: a `src/feat_*.bas` that is
-not registered, or a registered module that doesn't exist.
+Full lifecycle: [`docs/WORKFLOW.md`](docs/WORKFLOW.md). How source reaches a `.gms`:
+[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
-## Quick start
+## Layout
 
-See `docs/ADDING_A_MACRO.md` for how to add a new feature with minimal repetition.
+```
+macros/                          the macros (one folder per CorelDRAW VBA project)
+  registry.json                  id, CorelDRAW project name, folder, entry points, importForms
+  <macro>/{src,forms,scripts}
+build/                           tooling
+  macros.ps1                     inventory / -Verify / -Json
+  validate.ps1                   static checks (+ -Macro <id> to lint one macro)
+  package-macro.ps1              package one macro into build\_out\macros\<id>
+  deploy.ps1                     push/pull/stage a macro's code to/from CorelDRAW
+  new-feature.ps1                scaffold a module for the shared scaffold project (src/)
+  package.ps1                    package the shared scaffold project (src/)
+  templates/feat_template.bas    safe-run module skeleton
+tools/dev-import/modDevImport.bas  in-CorelDRAW bootstrap importer
+src/                             OPTIONAL shared scaffold (see below)
+docs/                            see docs/README.md
+.github/workflows/validate.yml   CI: static validation
+```
 
-## Build & validate
+## Optional shared scaffold (`src/`)
+
+`src/` is a single-project VBA **scaffold**: safe-run entry pattern, feature
+registry, session circuit breaker, COM-lifecycle helpers, a pure-logic test harness,
+and static validation. **No shipped macro depends on it yet** — it is kept as
+reference material and a starting point for new macro code.
+
+Its documentation: `docs/ARCHITECTURE.md`, `docs/CONVENTIONS.md`,
+`docs/ADDING_A_MACRO.md`, `docs/TESTING.md`, `docs/RELEASE_CHECKLIST.md`.
 
 ```powershell
-powershell -File build/validate.ps1        # cross-platform static lint (safe for CI)
-powershell -File build/package.ps1         # assemble versioned package into build/_out
+powershell -File build/validate.ps1        # static lint (safe for CI, no CorelDRAW needed)
+powershell -File build/package.ps1         # assemble a versioned package of src/
 ```
 
-### Deploy modules to CorelDRAW
+## Provenance
 
-```batch
-build\sync_gms_modules.bat                  # auto-detect GMS folder and copy .bas/.frm files
-build\sync_gms_modules.bat "C:\path\to\GMS" # copy to an explicit GMS folder path
-```
-
-The script auto-detects the CorelDRAW GMS folder from `%APPDATA%\Corel` (or
-`%LOCALAPPDATA%\Corel` as fallback), or you can override via the
-`VITTIX_GMS_DIR` environment variable. See the script header for exit codes.
+The macros were migrated from `github.com/ketandholakia/Vittix-CDR-Macro` (that
+checkout has been archived). Migration details and mapping: [`docs/MACROS.md`](docs/MACROS.md).
