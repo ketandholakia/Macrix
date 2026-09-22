@@ -14,13 +14,20 @@ Attribute VB_Name = "mdlFormBuilder"
 ' Coordinate conversion: VB6 twips / 15 = MSForms points.
 '==============================================================
 Option Explicit
+Option Private Module
 
 Private Const FORM_NAME As String = "frmImpositionSettings"
 
 Public Sub BuildImpositionFormWithCode()
 
     Dim vbProj As Object
-    Set vbProj = Application.VBE.ActiveVBProject
+    Set vbProj = TargetProject()
+    If vbProj Is Nothing Then
+        MsgBox "Could not access the VBA project model." & vbCrLf & vbCrLf & _
+               "CorelDRAW must allow VBA project access (Tools > Options > VBA).", _
+               vbCritical, "Imposition"
+        Exit Sub
+    End If
 
     ' 1. Remove any existing/broken form to prevent duplicates
     On Error Resume Next
@@ -93,7 +100,31 @@ End Sub
 ' Returns True if a form component with the expected name exists.
 Public Function ImpositionFormExists() As Boolean
     On Error Resume Next
-    ImpositionFormExists = Not Application.VBE.ActiveVBProject.VBComponents(FORM_NAME) Is Nothing
+    Dim proj As Object
+    Set proj = TargetProject()
+    If proj Is Nothing Then Exit Function
+    ImpositionFormExists = Not proj.VBComponents(FORM_NAME) Is Nothing
+    Err.Clear
+    On Error GoTo 0
+End Function
+
+' Resolve the VBA project this code lives in. Application.VBE.ActiveVBProject is
+' frequently Nothing at runtime (the editor is not open), which silently broke the
+' form build -- so find the project that owns this module instead.
+Private Function TargetProject() As Object
+    On Error Resume Next
+    Dim proj As Object, comp As Object
+    Set TargetProject = Application.VBE.ActiveVBProject
+    If Not TargetProject Is Nothing Then Exit Function
+    Set TargetProject = Nothing
+    For Each proj In Application.VBE.VBProjects
+        For Each comp In proj.VBComponents
+            If StrComp(comp.Name, "mdlFormBuilder", vbTextCompare) = 0 Then
+                Set TargetProject = proj
+                Exit Function
+            End If
+        Next comp
+    Next proj
     Err.Clear
     On Error GoTo 0
 End Function

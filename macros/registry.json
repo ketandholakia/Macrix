@@ -47,7 +47,7 @@
       "project": "macrixImposition",
       "importForms": false,
       "dir": "macrixImposition",
-      "entryPoints": [ "modImposition.RunImposition" ],
+      "entryPoints": [ "modImposition.ShowImpositionForm" ],
       "stability": "experimental",
       "status": "active"
     }

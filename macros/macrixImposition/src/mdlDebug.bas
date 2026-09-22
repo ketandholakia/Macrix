@@ -1,5 +1,6 @@
-Attribute VB_Name = "mdlDebugLog"
+Attribute VB_Name = "mdlDebug"
 Option Explicit
+Option Private Module
 
 Sub DebugBuildForm()
     Dim f As Integer

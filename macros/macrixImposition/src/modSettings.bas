@@ -1,3 +1,4 @@
+Attribute VB_Name = "modSettings"
 '==============================================================
 ' modSettings
 ' Holds all imposition settings as Public variables so both the
@@ -8,6 +9,7 @@
 '==============================================================
 
 Option Explicit
+Option Private Module
 
 Public g_SettingsInitialized As Boolean
 

@@ -1,3 +1,4 @@
+Attribute VB_Name = "modImposition"
 '==============================================================
 ' modImposition
 ' Core imposition logic for CorelDRAW: Simple N-up, Step & Repeat,
@@ -22,7 +23,7 @@
 
 Option Explicit
 
-Sub ShowImpositionForm()
+Public Sub ShowImpositionForm()
     InitDefaultSettings
     ' The form is generated at runtime by mdlFormBuilder (CorelDRAW's
     ' VBE cannot load VB6-format .frm files). Build it if missing, then
@@ -33,7 +34,7 @@ Sub ShowImpositionForm()
     VBA.UserForms.Add("frmImpositionSettings").Show
 End Sub
 
-Sub RunImposition()
+Private Sub RunImposition()
 
     Dim srcDoc As Document
     Dim outDoc As Document
@@ -144,7 +145,7 @@ End Sub
 ' of 0 means "leave this slot blank". Returns False (and shows a
 ' message box) if settings are invalid for the chosen mode.
 '--------------------------------------------------------------
-Function BuildPageOrder(totalPages As Integer, pagesPerSheet As Integer, _
+Private Function BuildPageOrder(totalPages As Integer, pagesPerSheet As Integer, _
                          ByRef orderArr() As Integer) As Boolean
 
     Dim i As Integer, s As Integer, idx As Integer
@@ -229,7 +230,7 @@ End Function
 ' outPage at the given cell position (top-left of cell), without
 ' scaling (imposition normally preserves original page size).
 '--------------------------------------------------------------
-Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
+Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
                      outDoc As Document, outPage As Page, _
                      cellX As Double, cellY As Double, _
                      cellW As Double, cellH As Double)
@@ -274,7 +275,7 @@ End Sub
 ' Draws 8 short crop-mark lines (2 per corner) just outside the
 ' cell's trim box, offset by bleedSize.
 '--------------------------------------------------------------
-Sub DrawCropMarks(outDoc As Document, outPage As Page, _
+Private Sub DrawCropMarks(outDoc As Document, outPage As Page, _
                    cellX As Double, cellY As Double, _
                    cellW As Double, cellH As Double, bleedSize As Double)
 

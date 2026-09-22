@@ -6,6 +6,23 @@ CHANGELOG entry here, not just internal refactors (§43).
 
 ## [Unreleased]
 
+### Added — macrixImposition built
+- **Fixed the compile blockers:** `modImposition.bas`, `modSettings.bas` and
+  `ImpositionMacro.bas` had **no `Attribute VB_Name`**, and `mdlDebug.bas` declared
+  `VB_Name = "mdlDebugLog"` — the VBE would have created mis-named components.
+- **Resolved "Ambiguous name detected":** `ImpositionMacro.bas` was a standalone copy
+  defining the same four procedures as `modImposition.bas`; it moved to
+  `macros/macrixImposition/legacy/` (with a note) and `src/` now holds only the modular set.
+- **Macro-list hygiene** (same as dimension-tools): `RunImposition`, `BuildPageOrder`,
+  `PlacePageInCell`, `DrawCropMarks` are now Private and `Option Private Module` was added
+  to `modSettings`/`mdlFormBuilder`/`mdlDebug`, leaving one entry:
+  **`modImposition.ShowImpositionForm`**.
+- **Hardened the form builder:** `Application.VBE.ActiveVBProject` is usually Nothing at
+  runtime, so the new `TargetProject()` finds the project that owns `mdlFormBuilder`
+  instead — otherwise the runtime form build failed silently.
+- Deployed into `macrixImposition.gms`; verified 5 components and a 1-entry macro list.
+  The settings dialog is built at run time (the checked-in `.frm` is VB6 format).
+
 ### Changed — Vittix → Macrix rebrand finished for the live projects
 - CorelDRAW projects renamed in the GMS folder: `VittixDimensionTools.gms` →
   **`MacrixTools.gms`**, `VittixSelectSame.gms` → `MacrixSelectSame.gms`,

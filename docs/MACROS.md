@@ -90,14 +90,14 @@ is VB6-format and CorelDRAW's VBE cannot load it reliably).
   produces a control-less form — which makes the whole project fail to compile with
   "Method or data member not found". The form lives in the `.gms`; rebuild it with
   `macros/macrixTools/scripts/Build-Form.ps1` and keep `importForms: false`.
-- **`macrixImposition` sources are not importable as-is:** `ImpositionMacro.bas`,
-  `modImposition.bas` and `modSettings.bas` have **no `Attribute VB_Name`** (never
-  exported from the VBE), and `mdlDebug.bas` declares `Attribute VB_Name =
-  "mdlDebugLog"`, which does not match its file name. Importing them would create
-  mis-named components. Surfaced by `validate.ps1 -Macro imposition`.
-- **`macrixImposition` also defines `RunImposition` (and `BuildPageOrder`,
-  `PlacePageInCell`, `DrawCropMarks`) in both `ImpositionMacro.bas` and
-  `modImposition.bas`** — likely one module is a superseded copy of the other.
+- **`macrixImposition` — RESOLVED.** It had three modules with no `Attribute VB_Name`
+  (`ImpositionMacro.bas`, `modImposition.bas`, `modSettings.bas`) and `mdlDebug.bas`
+  declaring `VB_Name = "mdlDebugLog"`, plus `ImpositionMacro.bas` defining the same four
+  procedures as `modImposition.bas` (an "Ambiguous name detected" compile error). The
+  attributes are fixed, the standalone copy now lives in `macrixImposition/legacy/`, and
+  the macro deploys with a single macro-list entry: `modImposition.ShowImpositionForm`.
+  Its `frmImpositionSettings` is **built at runtime** by `mdlFormBuilder`, because the
+  checked-in `.frm` is VB6 format (`Begin VB.Form`) that the VBE cannot import.
 - **Source of truth moved here.** The original `macrixcdrMacro` checkout is now
   marked archived **locally** (`ARCHIVED.md` + a README banner, commit `0048ff4`);
   its uncommitted work was deliberately preserved there. Its public remote
