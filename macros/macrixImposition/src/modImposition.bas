@@ -254,21 +254,34 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
     Set beforeShapes = outPage.Shapes.All
     beforeCount = beforeShapes.Count
 
-    ' Copy the source page's shapes onto the sheet page's layer.
-    ' Two things learned the hard way:
-    '   * ShapeRange.Copy copies nothing unless the range is SELECTED first -- an
-    '     unselected Shapes.All.Copy leaves the clipboard empty;
-    '   * ShapeRange.CopyToLayer refuses to cross documents ("Specified object is from
-    '     another document"), so it cannot be used here.
-    srcDoc.Activate
-    srcShapes.CreateSelection
-    srcShapes.Copy
-
-    outDoc.Activate
-    outPage.Activate
-    outPage.ActiveLayer.Paste
+    ' Transfer the page content through a temporary CDR file.
+    ' The clipboard route transfers NOTHING here: the field diagnostics showed the source
+    ' page held an unlocked shape while the sheet page count never increased (with and
+    ' without selecting first), and ShapeRange.CopyToLayer refuses to cross documents.
+    ' Export/Import are called late-bound so a wrong argument count cannot break the build.
+    Dim tmpFile As String
+    tmpFile = Environ$("TEMP") & "\macrix_impose_" & CStr(srcPageIdx) & ".cdr"
+    On Error Resume Next
+    If Len(Dir$(tmpFile)) > 0 Then Kill tmpFile
+    srcPage.Activate
+    CallByName srcDoc, "Export", VbMethod, tmpFile, cdrCDR, cdrCurrentPage
+    CallByName outPage.ActiveLayer, "Import", VbMethod, tmpFile
+    If Len(Dir$(tmpFile)) > 0 Then Kill tmpFile
+    Err.Clear
+    On Error GoTo 0
 
     Set dupShapes = p_NewShapesSince(outPage, beforeCount)
+
+    ' Last resort: clipboard round-trip, with the source shapes selected first.
+    If dupShapes.Count = 0 Then
+        srcDoc.Activate
+        srcShapes.CreateSelection
+        srcShapes.Copy
+        outDoc.Activate
+        outPage.Activate
+        outPage.ActiveLayer.Paste
+        Set dupShapes = p_NewShapesSince(outPage, beforeCount)
+    End If
 
     If dupShapes.Count = 0 Then
         ' Nothing landed on the sheet page. Report the counts rather than failing
