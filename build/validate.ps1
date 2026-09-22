@@ -15,8 +15,11 @@
 *   8. Feature registry drift:
 *        - every src\feat_*.bas is registered in modFeatureRegistry, and
 *        - every module named by an FR_Register call actually exists.
+*   9. Macro registry (macros\registry.json): each registered macro's folder and
+*      entry-point modules exist in the sibling macro checkout. Warns (does not
+*      fail) when the macro root is not present, so CI stays green off-machine.
 *
-* Structural checks (1-7) also cover tools\dev-import; check 8 is src-only.
+* Structural checks (1-7) also cover tools\dev-import; checks 8-9 are src/macros.
 *
 * Exit code 0 = OK, 1 = errors, 2 = warnings-only.
 #>
@@ -150,6 +153,55 @@ if (Test-Path $regFile) {
 }
 else {
     AddWarn 'modFeatureRegistry.bas not found; skipping registry drift checks'
+}
+
+# 9. Macro registry <-> sibling macro checkout drift.
+$repoRootForMacros = Split-Path $PSScriptRoot -Parent
+$macroRegFile = Join-Path $repoRootForMacros 'macros\registry.json'
+if (Test-Path -LiteralPath $macroRegFile) {
+    try {
+        $mreg = Get-Content -Raw -LiteralPath $macroRegFile -Encoding UTF8 | ConvertFrom-Json
+        $macroRoot = $mreg.macroRoot
+        if ($env:VITTIX_MACRO_ROOT) { $macroRoot = $env:VITTIX_MACRO_ROOT }
+        if (-not [System.IO.Path]::IsPathRooted($macroRoot)) {
+            $macroRoot = Join-Path $repoRootForMacros $macroRoot
+        }
+        if (-not (Test-Path -LiteralPath $macroRoot)) {
+            # Informational, not a warning: the macro checkout is expected to be
+            # absent on CI, and a warning would flip the exit code to 2 and fail CI.
+            Write-Host "macro registry: macro root not found ($macroRoot); skipping macro checks"
+        }
+        else {
+            foreach ($mac in $mreg.macros) {
+                $mdir = Join-Path $macroRoot $mac.dir
+                if (-not (Test-Path -LiteralPath $mdir)) {
+                    AddError "macro registry: '$($mac.id)' folder missing ($($mac.dir))"
+                    continue
+                }
+                foreach ($ep in $mac.entryPoints) {
+                    $parts = $ep -split '\.'
+                    $mod   = $parts[0]
+                    $proc  = if ($parts.Count -gt 1) { $parts[1] } else { $null }
+                    $modFile = $null
+                    foreach ($ext in '.bas', '.cls') {
+                        $cand = Join-Path $mdir "src\$mod$ext"
+                        if (Test-Path -LiteralPath $cand) { $modFile = $cand; break }
+                    }
+                    if (-not $modFile) {
+                        AddError "macro registry: '$($mac.id)' entry point '$ep' -> module '$mod' not found"
+                        continue
+                    }
+                    if ($proc) {
+                        $mtext = Get-Content -Raw -LiteralPath $modFile
+                        if ($mtext -notmatch "(?im)^\s*(Public\s+|Private\s+|Friend\s+)?(Sub|Function)\s+$([regex]::Escape($proc))\s*\(") {
+                            AddError "macro registry: '$($mac.id)' entry point '$ep' -> procedure '$proc' not found in $mod"
+                        }
+                    }
+                }
+            }
+        }
+    }
+    catch { AddWarn "macro registry could not be parsed: $($_.Exception.Message)" }
 }
 
 Write-Host ("errors: {0}  warnings: {1}" -f $errors.Count, $warnings.Count)

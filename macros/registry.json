@@ -1,0 +1,49 @@
+{
+  "schema": "vittix.macro-registry/v1",
+  "macroRoot": "..\\vittixcdrMacro",
+  "notes": [
+    "Each entry is a separate CorelDRAW VBA project with its own .gms file.",
+    "They are NOT modules of the Vittix project: several module names collide across",
+    "macros (modSettings, modUnits, mdlFormBuilder), so they must stay separate projects.",
+    "'entryPoints' are 'Module.Procedure' names callable from CorelDRAW.",
+    "'project' must match the Global Macro Project name saved inside CorelDRAW exactly."
+  ],
+  "macros": [
+    {
+      "id": "select-same",
+      "display": "Vittix Select Same",
+      "project": "VittixSelectSame",
+      "dir": "VittixSelectSame",
+      "entryPoints": [ "mdlMain.SelectSimilarObjects" ],
+      "stability": "beta",
+      "status": "active"
+    },
+    {
+      "id": "bleed",
+      "display": "Vittix Bleed",
+      "project": "vittixBleed",
+      "dir": "vittixBleed",
+      "entryPoints": [ "Bleeds.Start" ],
+      "stability": "beta",
+      "status": "active"
+    },
+    {
+      "id": "dimension-tools",
+      "display": "Vittix Dimension Tools",
+      "project": "VittixDimensionTools",
+      "dir": "vittixdimension",
+      "entryPoints": [ "modMain.VittixDimension", "modMain.VittixDimensionTools_Create" ],
+      "stability": "beta",
+      "status": "active"
+    },
+    {
+      "id": "imposition",
+      "display": "Vittix Imposition",
+      "project": "vittixImposition",
+      "dir": "vittixImposition",
+      "entryPoints": [ "modImposition.RunImposition" ],
+      "stability": "experimental",
+      "status": "active"
+    }
+  ]
+}

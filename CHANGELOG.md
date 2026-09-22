@@ -22,6 +22,18 @@ CHANGELOG entry here, not just internal refactors (§43).
   CI files to LF.
 - **`docs/WORKFLOW.md`** — the end-to-end macro development loop.
 
+### Added — multi-macro support
+- **`macros/registry.json`** — declarative registry of the CorelDRAW macro projects
+  this framework manages (id, Global Macro Project name, folder, entry points,
+  stability). First entries: `select-same`, `bleed`, `dimension-tools`, `imposition`.
+- **`build/macros.ps1`** — inventory + verification of the registered macros
+  (`-Json`, `-Verify`). Resolves the macro root from `..\vittixcdrMacro` by default,
+  overridable with `-MacroRoot` / `VITTIX_MACRO_ROOT`.
+- **`docs/MACROS.md`** — the macro model, why the macros stay separate VBA projects
+  (module-name collisions across macros), and the first inventory's findings.
+- `build/validate.ps1` check 9: macro-registry drift vs the macro checkout. Warns
+  (does not fail) when the macro root is absent, so CI stays green off-machine.
+
 ### Added — deployment to CorelDRAW
 - **`build/deploy.ps1`** — imports the repo's VBA modules into a CorelDRAW `.gms`
   project. Dry-run by default (`-Apply` to write); validates first; never quits a

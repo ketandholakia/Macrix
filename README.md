@@ -35,13 +35,16 @@ build/
     validate.ps1   Static checks (naming, structure, registry drift, paths)
     new-feature.ps1        Scaffolds a new registered feature module
     deploy.ps1     Imports src modules into a CorelDRAW .gms (dry-run default)
+    macros.ps1     Inventory/verify the macros registered in macros\registry.json
     templates/feat_template.bas   Safe-run feature skeleton
     package.ps1    Assembles a versioned source package for import/distribution
     sync_gms_modules.bat   Copies .bas/.frm modules into the CorelDRAW GMS folder
     installer/INNO_SETUP_TEMPLATE.iss
 tools/dev-import/modDevImport.bas   In-app bootstrap importer (runs inside CorelDRAW)
+macros/registry.json              Declarative list of the managed CorelDRAW macro projects
 .github/workflows/validate.yml   CI: runs build/validate.ps1 on push/PR
 docs/DEPLOYMENT.md               How source reaches a CorelDRAW .gms project
+docs/MACROS.md                   The macros this framework manages + their layout
 docs/
     ARCHITECTURE.md  CONVENTIONS.md  ADDING_A_MACRO.md  TESTING.md  RELEASE_CHECKLIST.md
 ```
