@@ -6,6 +6,18 @@ CHANGELOG entry here, not just internal refactors (§43).
 
 ## [Unreleased]
 
+### Fixed — macrixImposition "Sub or Function not defined"
+- Self-inflicted regression: I made `RunImposition` **Private**, but **`Private` in VBA is
+  module-scoped**, so the form's `cmdRun_Click` could no longer call it → *"Compile error:
+  Sub or Function not defined"*. `Option Private Module` is the *project*-scoped equivalent:
+  it hides a module from the macro list without breaking in-project calls.
+- Restructured to match dimension-tools: new **`modMain.bas`** holds the single public entry
+  `ShowImpositionForm`; `modImposition` is now `Option Private Module` with a public-but-hidden
+  `RunImposition`. Macro list = 1 → `modMain.ShowImpositionForm` (registry updated).
+- Lesson recorded in `docs/DEPLOYMENT.md`: a `.gms` is flushed by CorelDRAW **~40–60 s after**
+  the instance exits, and *every* instance rewrites the `.gms` it loaded on exit — so verify
+  only after the write settles, or a stale instance can clobber it.
+
 ### Fixed — macrixImposition runtime error 424
 - `ShowImpositionForm` died with **"Run-time error '424': Object required"**. The runtime
   form builder did `Set newFormComp = vbProj.VBComponents.Add(3)` and then, unguarded,

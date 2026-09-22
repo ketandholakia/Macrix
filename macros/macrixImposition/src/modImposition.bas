@@ -22,16 +22,9 @@ Attribute VB_Name = "modImposition"
 '==============================================================
 
 Option Explicit
+Option Private Module
 
-Public Sub ShowImpositionForm()
-    InitDefaultSettings
-    ' frmImpositionSettings is a real design-time form in this project (built by
-    ' scripts\Build-Form.ps1 and exported to forms\frmImpositionSettings.frm), so it is
-    ' shown directly: no runtime form generation and no VBE access required.
-    frmImpositionSettings.Show
-End Sub
-
-Private Sub RunImposition()
+Public Sub RunImposition()
 
     Dim srcDoc As Document
     Dim outDoc As Document

@@ -114,8 +114,26 @@ project is saved/unloaded or when CorelDRAW closes. Path A attempts
 `VBProject.SaveAs` automatically and reports the outcome; if a project refuses the
 save, save from the VBE or unload/reload the project.
 
+### Timing: the flush is deferred, and every instance rewrites on exit
+
+Two behaviours worth knowing before you verify anything:
+
+1. CorelDRAW writes the `.gms` **roughly 40–60 s after the automation instance exits** —
+   immediately after `Quit()` the file still has its old size and timestamp.
+2. **Every** CorelDRAW instance rewrites the `.gms` files it loaded when *it* exits. So if
+   you launch a second instance to "check" before the first one's write has landed, that
+   instance loads the stale copy and writes it back — silently undoing the deploy.
+
+Practical rule: deploy, wait for the timestamp to change (check the file directly, without
+launching CorelDRAW), and only then verify.
+
 > ⚠️ Do not edit a `.gms` that is currently running a macro. Keep the VBE closed
 > during an import (`deploy.ps1 -Apply` will not close it for you).
+
+> Also: `Private` in VBA is **module-scoped**. To hide a module's procedures from
+> CorelDRAW's macro list while keeping them callable from the rest of the project, use
+> `Option Private Module` in a standard module — not `Private`. `Private` will break any
+> caller in a different module (a UserForm, for instance).
 
 ---
 
