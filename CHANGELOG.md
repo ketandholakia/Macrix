@@ -22,6 +22,24 @@ CHANGELOG entry here, not just internal refactors (§43).
   CI files to LF.
 - **`docs/WORKFLOW.md`** — the end-to-end macro development loop.
 
+### Added — per-macro pipeline (dimension-tools first)
+- **`build/deploy.ps1` now takes `-Macro <id>`** and resolves the target from the
+  registry: source dir, `forms` handling, and the CorelDRAW project name. It does
+  both directions -- push (`-Apply`, default) and pull (`-Pull [-Apply]`) -- with a
+  dry-run plan by default. `.frm` import is controlled by each macro's
+  `importForms` flag. Unknown ids exit `6`.
+- **`build/package-macro.ps1`** -- packages a registered macro (modules, forms,
+  README) into `build\_out\macros\<id>` with a `MANIFEST.txt`. Output lives under
+  the gitignored `build\_out` tree, so it no longer writes into the source folders.
+  Fixes the upstream manifest defect (`System.Object[]`).
+- **`build/validate.ps1 -Macro <id>`** -- lints one macro's `src\` (structure +
+  `Attribute VB_Name`); scoped so a broken legacy macro cannot block work on
+  another. Host document modules (`ThisMacroStorage`, ...) are exempt from
+  `Option Explicit`.
+- Registry: added a per-macro `importForms` flag.
+- Surfaced (not yet fixed) by the new lint: `vittixImposition` has three modules
+  with **no `Attribute VB_Name`** and `mdlDebug.bas` mis-declares its own name.
+
 ### Added — macro sources migrated into this repo
 - Migrated the four macro projects from the standalone `vittixcdrMacro` checkout
   into `macros/` (`VittixSelectSame`, `vittixBleed`, `vittixdimension`,

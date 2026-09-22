@@ -56,22 +56,46 @@ warning), so static CI stays green off-machine.
 ## Commands
 
 ```powershell
-powershell -File build/macros.ps1            # inventory: modules/forms/entry points per macro
-powershell -File build/macros.ps1 -Verify    # exit 1 if any declared file is missing
-powershell -File build/macros.ps1 -Json      # machine-readable dump
-powershell -File build/validate.ps1          # includes macro-registry drift checks
+# inventory / verification
+powershell -File build/macros.ps1                        # modules/forms/entry points per macro
+powershell -File build/macros.ps1 -Verify                # exit 1 if any declared file/proc is missing
+powershell -File build/macros.ps1 -Json                  # machine-readable dump
+
+# validation (scoped per macro so one legacy macro cannot block another)
+powershell -File build/validate.ps1                          # framework src + registry drift
+powershell -File build/validate.ps1 -Macro dimension-tools   # + lint that macro's src\
+
+# package a macro
+powershell -File build/package-macro.ps1 -Macro dimension-tools
+
+# deploy / sync a macro against its CorelDRAW project
+powershell -File build/deploy.ps1 -Macro dimension-tools              # dry-run push plan
+powershell -File build/deploy.ps1 -Macro dimension-tools -Apply       # push source -> project
+powershell -File build/deploy.ps1 -Macro dimension-tools -Pull        # dry-run pull plan
+powershell -File build/deploy.ps1 -Macro dimension-tools -Pull -Apply # pull project -> source
+powershell -File build/deploy.ps1 -Macro dimension-tools -Stage       # stage for modDevImport
 ```
+
+Each macro declares `importForms` in the registry: `true` imports its `.frm`, `false`
+skips it because the UserForm is generated at runtime by `mdlFormBuilder` (the `.frm`
+is VB6-format and CorelDRAW's VBE cannot load it reliably).
 
 ## Known issues in the migrated macro sources
 
 - **`mdlFormBuilder.bas` exists in three macros at three different revisions**
   (13.4 KB / 17.5 KB / 18.9 KB) — a shared module copy-pasted and diverged.
   Candidate for extraction into one shared module.
-- **`vittixImposition` has `RunImposition` (and `BuildPageOrder`, `PlacePageInCell`,
-  `DrawCropMarks`) defined in both `ImpositionMacro.bas` and `modImposition.bas`** —
-  likely one module is a superseded copy of the other.
-- **Uncommitted / untracked work**: the whole `vittixImposition` macro and
-  `vittixdimension/src/mdlFormBuilder.bas` are untracked in that repo.
+- **`vittixImposition` sources are not importable as-is:** `ImpositionMacro.bas`,
+  `modImposition.bas` and `modSettings.bas` have **no `Attribute VB_Name`** (never
+  exported from the VBE), and `mdlDebug.bas` declares `Attribute VB_Name =
+  "mdlDebugLog"`, which does not match its file name. Importing them would create
+  mis-named components. Surfaced by `validate.ps1 -Macro imposition`.
+- **`vittixImposition` also defines `RunImposition` (and `BuildPageOrder`,
+  `PlacePageInCell`, `DrawCropMarks`) in both `ImpositionMacro.bas` and
+  `modImposition.bas`** — likely one module is a superseded copy of the other.
+- **Source of truth moved here.** The original `vittixcdrMacro` checkout (and its
+  GitHub remote) still exists with its own uncommitted work; archive it to avoid
+  divergence.
 - Per-macro `Sync-To-GMS.ps1` / `Sync-From-GMS.ps1` are near-duplicates differing
   only by the hard-coded project name.
 - `Sync-*-GMS.ps1` call `GetActiveObject("CorelDRAW.Application")`, which fails for a

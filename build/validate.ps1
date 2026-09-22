@@ -18,13 +18,16 @@
 *   9. Macro registry (macros\registry.json): each registered macro's folder and
 *      entry-point modules exist in the sibling macro checkout. Warns (does not
 *      fail) when the macro root is not present, so CI stays green off-machine.
+*  10. Optional -Macro <id>: additionally lint that macro's src\ (structural
+*      checks only; host document modules are exempt from Option Explicit).
 *
 * Structural checks (1-7) also cover tools\dev-import; checks 8-9 are src/macros.
 *
 * Exit code 0 = OK, 1 = errors, 2 = warnings-only.
 #>
 param(
-    [string]$SrcDir = (Join-Path $PSScriptRoot '..\src')
+    [string]$SrcDir = (Join-Path $PSScriptRoot '..\src'),
+    [string]$Macro
 )
 $ErrorActionPreference = 'Continue'
 
@@ -49,6 +52,37 @@ $scanDirs = @($SrcDir)
 $toolsDir = Join-Path (Split-Path $SrcDir -Parent) 'tools\dev-import'
 if (Test-Path $toolsDir) { $scanDirs += $toolsDir }
 
+# Optional (-Macro <id>): additionally lint one registered macro's sources, so a
+# problem in one legacy macro cannot block work on another.
+if ($Macro) {
+    $repoRootV = Split-Path $PSScriptRoot -Parent
+    $regFileV  = Join-Path $repoRootV 'macros\registry.json'
+    if (-not (Test-Path -LiteralPath $regFileV)) {
+        AddError "unknown macro '$Macro': macro registry not found"
+    }
+    else {
+        try {
+            $mregV = Get-Content -Raw -LiteralPath $regFileV -Encoding UTF8 | ConvertFrom-Json
+            $mentry = $mregV.macros | Where-Object { $_.id -eq $Macro }
+            if (-not $mentry) {
+                AddError "unknown macro id '$Macro'"
+            }
+            else {
+                $macroRootV = $mregV.macroRoot
+                if ($env:VITTIX_MACRO_ROOT) { $macroRootV = $env:VITTIX_MACRO_ROOT }
+                if (-not [System.IO.Path]::IsPathRooted($macroRootV)) { $macroRootV = Join-Path $repoRootV $macroRootV }
+                $macroSrcV = Join-Path (Join-Path $macroRootV $mentry.dir) 'src'
+                if (Test-Path -LiteralPath $macroSrcV) {
+                    Write-Host "macro lint: $Macro ($($mentry.project))"
+                    $scanDirs += $macroSrcV
+                }
+                else { AddError "macro '$Macro': src dir not found ($macroSrcV)" }
+            }
+        }
+        catch { AddError "macro registry could not be parsed: $($_.Exception.Message)" }
+    }
+}
+
 $files = foreach ($d in $scanDirs) {
     Get-ChildItem -Path $d -Recurse -File -Include *.bas, *.cls, *.frm -ErrorAction SilentlyContinue
 }
@@ -60,8 +94,9 @@ foreach ($file in $files) {
     if ($null -eq $text) { continue }
     $lines = $text -split "`r?`n"
 
-    # 1. Option Explicit
-    if ($file.Extension -ne '.frm' -and $text -notmatch '(?im)^\s*Option\s+Explicit\s*$') {
+    # 1. Option Explicit (host document modules never declare it)
+    $isDocModule = $file.BaseName -match '^(ThisMacroStorage|ThisDocument|ThisWorkbook|ThisDrawing)$'
+    if ($file.Extension -ne '.frm' -and -not $isDocModule -and $text -notmatch '(?im)^\s*Option\s+Explicit\s*$') {
         AddError "$name :: missing Option Explicit"
     }
 

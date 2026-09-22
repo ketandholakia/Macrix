@@ -34,8 +34,9 @@ src/
 build/
     validate.ps1   Static checks (naming, structure, registry drift, paths)
     new-feature.ps1        Scaffolds a new registered feature module
-    deploy.ps1     Imports src modules into a CorelDRAW .gms (dry-run default)
+    deploy.ps1     Push/pull src <-> a CorelDRAW .gms (per-macro via -Macro; dry-run default)
     macros.ps1     Inventory/verify the macros registered in macros\registry.json
+    package-macro.ps1   Packages one registered macro into build\_out\macros\<id>
     templates/feat_template.bas   Safe-run feature skeleton
     package.ps1    Assembles a versioned source package for import/distribution
     sync_gms_modules.bat   Copies .bas/.frm modules into the CorelDRAW GMS folder
