@@ -260,14 +260,23 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
     ' without selecting first), and ShapeRange.CopyToLayer refuses to cross documents.
     ' Export/Import are called late-bound so a wrong argument count cannot break the build.
     Dim tmpFile As String
+    Dim expInfo As String, impInfo As String, madeFile As Boolean
     tmpFile = Environ$("TEMP") & "\macrix_impose_" & CStr(srcPageIdx) & ".cdr"
+    expInfo = ""
+    impInfo = ""
+    madeFile = False
     On Error Resume Next
     If Len(Dir$(tmpFile)) > 0 Then Kill tmpFile
+    Err.Clear
     srcPage.Activate
     CallByName srcDoc, "Export", VbMethod, tmpFile, cdrCDR, cdrCurrentPage
-    CallByName outPage.ActiveLayer, "Import", VbMethod, tmpFile
-    If Len(Dir$(tmpFile)) > 0 Then Kill tmpFile
+    expInfo = CStr(Err.Number) & " " & Err.Description
+    madeFile = (Len(Dir$(tmpFile)) > 0)
     Err.Clear
+    CallByName outPage.ActiveLayer, "Import", VbMethod, tmpFile
+    impInfo = CStr(Err.Number) & " " & Err.Description
+    Err.Clear
+    If Len(Dir$(tmpFile)) > 0 Then Kill tmpFile
     On Error GoTo 0
 
     Set dupShapes = p_NewShapesSince(outPage, beforeCount)
@@ -300,7 +309,9 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
                "First source shape locked      : " & CStr(srcLocked) & vbCrLf & _
                "Source active layer            : " & srcLayer & vbCrLf & _
                "Shapes on the sheet page before: " & CStr(beforeCount) & vbCrLf & _
-               "Shapes on the sheet page after : " & CStr(outPage.Shapes.Count), _
+               "Shapes on the sheet page after : " & CStr(outPage.Shapes.Count) & vbCrLf & vbCrLf & _
+               "Export: " & expInfo & "   (file created: " & CStr(madeFile) & ")" & vbCrLf & _
+               "Import: " & impInfo, _
                vbExclamation, "Imposition"
         Exit Sub
     End If
