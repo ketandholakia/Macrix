@@ -249,6 +249,13 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
     outDoc.Activate
     outPage.Activate
     Set dupShapes = outPage.ActiveLayer.Paste
+    ' Layer.Paste returns a pointer-typed result that VBA can surface as Nothing even
+    ' though the paste succeeded -- the pasted shapes become the selection, so fall back
+    ' to it. (Previously this raised "Run-time error 91: Object variable not set" on
+    ' dupShapes.SetPosition.)
+    If dupShapes Is Nothing Then Set dupShapes = outDoc.Selection
+    If dupShapes Is Nothing Then Exit Sub
+    If dupShapes.Count = 0 Then Exit Sub
 
     ' Position: align pasted content's top-left to the cell's top-left.
     ' (Assumes outDoc.ReferencePoint = cdrTopLeft, set in RunImposition.)
