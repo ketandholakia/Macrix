@@ -11,11 +11,10 @@ Public Type VDT_DimensionInfo
 End Type
 
 Public Sub ShowDimensionForm()
-    ' Build form at runtime if needed, then show it
-    If Not DimensionFormExists() Then
-        BuildDimensionFormWithCode
-    End If
-    frmDimension.LoadFormState
+    ' frmDimension is a REAL design-time form in the project (its controls and
+    ' code-behind are built by tooling and exported back to forms\frmDimension.frm),
+    ' so it is referenced directly. UserForm_Initialize -> LoadFormState loads the
+    ' current settings. No VBE / runtime form generation is involved.
     frmDimension.Show
 End Sub
 

@@ -85,6 +85,11 @@ is VB6-format and CorelDRAW's VBE cannot load it reliably).
 - **`mdlFormBuilder.bas` exists in three macros at three different revisions**
   (13.4 KB / 17.5 KB / 18.9 KB) — a shared module copy-pasted and diverged.
   Candidate for extraction into one shared module.
+- **`vittixdimension`'s `frmDimension` must not be imported from the repo `.frm`.** Its
+  controls live in the binary `.frx`, and importing the `.frm` into CorelDRAW's VBE
+  produces a control-less form — which makes the whole project fail to compile with
+  "Method or data member not found". The form lives in the `.gms`; rebuild it with
+  `macros/vittixdimension/scripts/Build-Form.ps1` and keep `importForms: false`.
 - **`vittixImposition` sources are not importable as-is:** `ImpositionMacro.bas`,
   `modImposition.bas` and `modSettings.bas` have **no `Attribute VB_Name`** (never
   exported from the VBE), and `mdlDebug.bas` declares `Attribute VB_Name =

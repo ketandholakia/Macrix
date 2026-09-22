@@ -22,6 +22,24 @@ CHANGELOG entry here, not just internal refactors (§43).
   CI files to LF.
 - **`docs/WORKFLOW.md`** — the end-to-end macro development loop.
 
+### Fixed — dimension-tools compile error (VBA 461)
+- The deployed `frmDimension` was a **control-less** form (the repo `.frm` has no inline
+  control definitions; they live in the binary `.frx`), while `modDimension` and the
+  form's own code referenced `cmbUnit`, `cmbDecimals`, `cmbPosition`, `txtFontSize`,
+  `txtTextWidthPercent`, `txtGap`, `txtPadding`, `txtCornerRadius`, `chk*`, `txtTemplate`
+  and `LoadFormState`. Every one is *"Method or data member not found"*, and VBA
+  compiles the whole project as a unit, so nothing ran.
+- **Rebuilt `frmDimension` as a real design-time form** (29 controls + code-behind, via the
+  VBIDE Designer API) and simplified `modDimension.ShowDimensionForm` to
+  `frmDimension.Show`, removing the runtime VBE dependency (the old runtime builder could
+  never run, because the project did not compile).
+- Added **`macros/vittixdimension/scripts/Build-Form.ps1`** to reproduce the form.
+- `deploy.ps1` gained **`-RemoveComponents <names>`** (clear stale components) and
+  **`-RunMacro <Module.Macro>`** (`GMSManager.RunMacro(ModuleName, MacroName, Parameters)`).
+- Verified in the `.gms`: components `ThisMacroStorage, frmDimension, mdlFormBuilder` + the
+  9 modules; `frmDimension` has 29 controls and `LoadFormState`; `modDimension` uses the
+  direct form path.
+
 ### Added — binary .gms build (dimension-tools)
 - **`build/deploy.ps1 -OutDir <dir>`** copies the rebuilt `.gms` out as a build
   artifact after a push.

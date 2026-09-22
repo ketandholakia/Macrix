@@ -55,7 +55,9 @@ param(
     [switch]$StartCorel,
     [switch]$KeepCorel,
     [switch]$SkipValidate,
-    [string]$OutDir
+    [string]$OutDir,
+    [string]$RemoveComponents,
+    [string]$RunMacro
 )
 
 $ErrorActionPreference = 'Stop'
@@ -297,6 +299,33 @@ foreach ($m in $modules) {
         $fail++
         Write-Host ("  FAIL " + $m.BaseName + " :: " + $_.Exception.Message)
     }
+}
+
+# Optional: drop stale project components that are not in the source set. This is
+# how a broken design-time form (which blocks compilation) is cleared out.
+if ($RemoveComponents) {
+    foreach ($rc in ($RemoveComponents -split ',')) {
+        $rcName = $rc.Trim()
+        if (-not $rcName) { continue }
+        try {
+            $comp = $null
+            foreach ($c in $proj.VBComponents) { if ($c.Name -ieq $rcName) { $comp = $c; break } }
+            if ($comp) { $proj.VBComponents.Remove($comp); Write-Host ("  removed component " + $rcName) }
+            else { Write-Host ("  component not present: " + $rcName) }
+        } catch { Write-Host ("  remove failed " + $rcName + " :: " + $_.Exception.Message) }
+    }
+}
+
+# Optional: run a macro in the target project after the import (e.g. a runtime form
+# builder, or a smoke test).
+if ($RunMacro) {
+    # RunMacro(ModuleName, MacroName, Parameters)
+    $parts = $RunMacro -split '\.'
+    $modName = $parts[0]
+    $procName = $(if ($parts.Count -gt 1) { $parts[1] } else { $parts[0] })
+    Write-Host ("running macro: {0}.{1}" -f $modName, $procName)
+    try { $app.GMSManager.RunMacro($modName, $procName, ''); Write-Host '  macro returned' }
+    catch { Write-Host ("  macro failed: " + $_.Exception.Message) }
 }
 
 # VBProject.SaveAs is NOT supported for a .gms ("Method or property is not valid in

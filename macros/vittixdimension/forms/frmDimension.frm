@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmDimension 
-   Caption         =   "Vittix Dimension"
-   ClientHeight    =   4650
+   Caption         =   "UserForm1"
+   ClientHeight    =   3165
    ClientLeft      =   45
    ClientTop       =   390
-   ClientWidth     =   7170
+   ClientWidth     =   4710
    OleObjectBlob   =   "frmDimension.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -13,8 +13,6 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-
-
 Option Explicit
 
 Private Sub UserForm_Initialize()
@@ -66,7 +64,6 @@ Private Sub PopulateControls()
         cmbUnit.AddItem "IN"
         cmbUnit.AddItem "FT"
     End If
-
     If cmbDecimals.ListCount = 0 Then
         cmbDecimals.AddItem "0"
         cmbDecimals.AddItem "1"
@@ -74,7 +71,6 @@ Private Sub PopulateControls()
         cmbDecimals.AddItem "3"
         cmbDecimals.AddItem "4"
     End If
-
     If cmbPosition.ListCount = 0 Then
         cmbPosition.AddItem "Auto"
         cmbPosition.AddItem "Above"
@@ -83,4 +79,3 @@ Private Sub PopulateControls()
         cmbPosition.AddItem "Right"
     End If
 End Sub
-
