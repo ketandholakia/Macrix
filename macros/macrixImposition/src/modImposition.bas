@@ -248,27 +248,27 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
 
     If srcPage.Shapes.Count = 0 Then Exit Sub ' nothing to place
 
-    ' Copy the source page's shapes STRAIGHT onto the sheet page's layer.
-    ' The clipboard route (Shapes.All.Copy + Layer.Paste) put nothing on the clipboard in
-    ' this project, which is why the sheet page ended up holding only crop marks.
     Set srcShapes = srcPage.Shapes.All
     If srcShapes Is Nothing Then Exit Sub
 
     Set beforeShapes = outPage.Shapes.All
     beforeCount = beforeShapes.Count
-    srcShapes.CopyToLayer outPage.ActiveLayer
-    Set dupShapes = p_NewShapesSince(outPage, beforeCount)
 
-    ' Fallback: clipboard round-trip, with the source shapes selected first.
-    If dupShapes.Count = 0 Then
-        srcDoc.Activate
-        srcShapes.CreateSelection
-        srcShapes.Copy
-        outDoc.Activate
-        outPage.Activate
-        outPage.ActiveLayer.Paste
-        Set dupShapes = p_NewShapesSince(outPage, beforeCount)
-    End If
+    ' Copy the source page's shapes onto the sheet page's layer.
+    ' Two things learned the hard way:
+    '   * ShapeRange.Copy copies nothing unless the range is SELECTED first -- an
+    '     unselected Shapes.All.Copy leaves the clipboard empty;
+    '   * ShapeRange.CopyToLayer refuses to cross documents ("Specified object is from
+    '     another document"), so it cannot be used here.
+    srcDoc.Activate
+    srcShapes.CreateSelection
+    srcShapes.Copy
+
+    outDoc.Activate
+    outPage.Activate
+    outPage.ActiveLayer.Paste
+
+    Set dupShapes = p_NewShapesSince(outPage, beforeCount)
 
     If dupShapes.Count = 0 Then
         ' Nothing landed on the sheet page. Report the counts rather than failing
