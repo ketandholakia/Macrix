@@ -72,24 +72,39 @@ End Function
 Public Sub Label_PositionShape(labelShape As shape, bounds As VDT_Bounds, positionName As String, gapMM As Double)
     Dim targetX As Double
     Dim targetY As Double
+    Dim rotate90 As Boolean
 
     targetX = Geometry_GetCenterXFromBounds(bounds)
     targetY = Geometry_GetCenterYFromBounds(bounds)
 
-    Select Case LCase$(positionName)
+    Select Case LCase$(Trim$(positionName))
+        Case "center"
+            ' dead centre of the object
+            targetX = Geometry_GetCenterXFromBounds(bounds)
+            targetY = Geometry_GetCenterYFromBounds(bounds)
         Case "above"
             targetY = bounds.Top + gapMM
         Case "below"
             targetY = bounds.Bottom - gapMM
         Case "left"
             targetX = bounds.Left - gapMM
+            rotate90 = True
         Case "right"
             targetX = bounds.Right + gapMM
+            rotate90 = True
         Case Else
             ApplyAutoPosition bounds, gapMM, targetX, targetY
     End Select
 
+    ' Left/Right read vertically: rotate the label, then place its centre on the edge.
+    If rotate90 Then RotateShape labelShape, 90
     MoveShapeToPoint labelShape, targetX, targetY
+End Sub
+
+Private Sub RotateShape(shapeObj As shape, ByVal angleDeg As Double)
+    On Error Resume Next
+    If shapeObj Is Nothing Then Exit Sub
+    shapeObj.Rotate angleDeg
 End Sub
 
 Public Function CreateArtisticTextShape(doc As Document, x As Double, y As Double, text As String, ByVal fontSize As Double, settings As VDT_Settings, Optional objectWidthMM As Double = 0) As shape

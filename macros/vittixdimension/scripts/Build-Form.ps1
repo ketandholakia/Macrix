@@ -161,6 +161,7 @@ Private Sub PopulateControls()
     End If
     If cmbPosition.ListCount = 0 Then
         cmbPosition.AddItem "Auto"
+        cmbPosition.AddItem "Center"
         cmbPosition.AddItem "Above"
         cmbPosition.AddItem "Below"
         cmbPosition.AddItem "Left"
@@ -172,6 +173,14 @@ End Sub
     if ($cm.CountOfLines -gt 0) { $cm.DeleteLines(1, $cm.CountOfLines) }
     $cm.AddFromString($code)
     Write-Host ('code-behind lines: ' + $form.CodeModule.CountOfLines)
+
+    # Export the rebuilt form back into the repo so source tracks reality.
+    $formsDir = Join-Path (Split-Path $PSScriptRoot -Parent) 'forms'
+    if (Test-Path -LiteralPath $formsDir) {
+        $frmPath = Join-Path $formsDir 'frmDimension.frm'
+        $form.Export($frmPath)
+        Write-Host ('exported form -> ' + $frmPath)
+    }
     Write-Host 'form build done. CorelDRAW will persist it to the .gms on exit.'
 }
 catch { Write-Host ('ERROR: ' + $_.Exception.Message) }

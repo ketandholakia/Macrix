@@ -73,6 +73,7 @@ Private Sub PopulateControls()
     End If
     If cmbPosition.ListCount = 0 Then
         cmbPosition.AddItem "Auto"
+        cmbPosition.AddItem "Center"
         cmbPosition.AddItem "Above"
         cmbPosition.AddItem "Below"
         cmbPosition.AddItem "Left"

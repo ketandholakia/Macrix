@@ -22,6 +22,15 @@ CHANGELOG entry here, not just internal refactors (§43).
   CI files to LF.
 - **`docs/WORKFLOW.md`** — the end-to-end macro development loop.
 
+### Changed — dimension-tools label placement
+- **New `Center` position**: `Label_PositionShape` now has a `center` case that puts the
+  label at the object's centre, and the form's Position list is
+  `Auto, Center, Above, Below, Left, Right`.
+- **`Left`/`Right` now read vertically**: the label is rotated 90 degrees and its centre
+  placed on that edge (`Shape.Rotate 90` applied before the move).
+- Updated `modLabel.bas`, `mdlFormBuilder.bas` (injected form code) and
+  `macros/vittixdimension/scripts/Build-Form.ps1`; re-exported `forms/frmDimension.frm`.
+
 ### Fixed — dimension-tools compile error (VBA 461)
 - The deployed `frmDimension` was a **control-less** form (the repo `.frm` has no inline
   control definitions; they live in the binary `.frx`), while `modDimension` and the

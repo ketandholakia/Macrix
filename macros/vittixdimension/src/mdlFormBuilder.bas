@@ -194,6 +194,7 @@ Private Sub InjectCodeBehind(ByVal codeMod As Object)
     s = s & "    cmbDecimals.ListIndex = gSettings.decimals" & vbCrLf
     s = s & "" & vbCrLf
     s = s & "    cmbPosition.AddItem ""Auto""" & vbCrLf
+    s = s & "    cmbPosition.AddItem ""Center""" & vbCrLf
     s = s & "    cmbPosition.AddItem ""Above""" & vbCrLf
     s = s & "    cmbPosition.AddItem ""Below""" & vbCrLf
     s = s & "    cmbPosition.AddItem ""Left""" & vbCrLf
