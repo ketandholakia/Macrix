@@ -73,15 +73,16 @@ Public Sub RunImposition()
     Application.EventsEnabled = False
 
     ' Create a fresh output document
-    Set outDoc = CreateDocument
+    ' Build the sheets inside a DUPLICATE of the source document.
+    ' Every cross-document route is blocked in this object model: the clipboard carries
+    ' nothing, CopyToLayer refuses ("Specified object is from another document") and
+    ' Document.Export fails with a type mismatch (13). CopyToLayer DOES work within one
+    ' document, so the source pages come along in the duplicate and are deleted again once
+    ' the sheets have been built.
+    Set outDoc = srcDoc.Duplicate
     outDoc.Unit = g_Unit
     outDoc.ReferencePoint = cdrTopLeft
 
-    ' The placement below copies and pastes shapes. That round-trip needs a fully live
-    ' document context: with Optimization or EventsEnabled switched off, Copy silently
-    ' copies nothing, so every Paste comes back empty and the sheet ends up holding only
-    ' the crop marks. Diagnostics showed the source page had a shape while the sheet
-    ' page count never increased, so both are switched back on for the loop.
     Application.Optimization = False
     Application.EventsEnabled = True
 
@@ -89,14 +90,9 @@ Public Sub RunImposition()
 
     For sheetIndex = 1 To totalSheets
 
-        ' First sheet reuses the doc's default page; later ones are added
-        If sheetIndex = 1 Then
-            Set outPage = outDoc.Pages(1)
-        Else
-            ' AddPages, not Pages.Add: the Pages collection has no Add method (error 438).
-            outDoc.AddPages 1
-            Set outPage = outDoc.Pages(outDoc.Pages.Count)
-        End If
+        ' Sheets are appended after the duplicated source pages.
+        outDoc.AddPages 1
+        Set outPage = outDoc.Pages(outDoc.Pages.Count)
         outPage.SetSize g_SheetWidth, g_SheetHeight
 
         For r = 0 To g_GridRows - 1
@@ -132,6 +128,16 @@ Public Sub RunImposition()
 
     Application.Optimization = False
     Application.EventsEnabled = True
+
+    ' Drop the duplicated source pages, leaving only the imposed sheets.
+    Dim k As Integer
+    On Error Resume Next
+    For k = 1 To totalPages
+        outDoc.Pages(1).Delete
+    Next k
+    Err.Clear
+    On Error GoTo 0
+
     Application.Refresh
 
     MsgBox "Imposition complete (" & g_LayoutMode & "): " & totalSheets & _
@@ -244,7 +250,7 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
     Dim i As Long
 
     Set originalActiveDoc = Application.ActiveDocument
-    Set srcPage = srcDoc.Pages(srcPageIdx)
+    Set srcPage = outDoc.Pages(srcPageIdx)
 
     If srcPage.Shapes.Count = 0 Then Exit Sub ' nothing to place
 
@@ -254,39 +260,16 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
     Set beforeShapes = outPage.Shapes.All
     beforeCount = beforeShapes.Count
 
-    ' Transfer the page content through a temporary CDR file.
-    ' The clipboard route transfers NOTHING here: the field diagnostics showed the source
-    ' page held an unlocked shape while the sheet page count never increased (with and
-    ' without selecting first), and ShapeRange.CopyToLayer refuses to cross documents.
-    ' Export/Import are called late-bound so a wrong argument count cannot break the build.
-    Dim tmpFile As String
-    Dim expInfo As String, impInfo As String, madeFile As Boolean
-    tmpFile = Environ$("TEMP") & "\macrix_impose_" & CStr(srcPageIdx) & ".cdr"
-    expInfo = ""
-    impInfo = ""
-    madeFile = False
-    On Error Resume Next
-    If Len(Dir$(tmpFile)) > 0 Then Kill tmpFile
-    Err.Clear
-    srcPage.Activate
-    CallByName srcDoc, "Export", VbMethod, tmpFile, cdrCDR, cdrCurrentPage
-    expInfo = CStr(Err.Number) & " " & Err.Description
-    madeFile = (Len(Dir$(tmpFile)) > 0)
-    Err.Clear
-    CallByName outPage.ActiveLayer, "Import", VbMethod, tmpFile
-    impInfo = CStr(Err.Number) & " " & Err.Description
-    Err.Clear
-    If Len(Dir$(tmpFile)) > 0 Then Kill tmpFile
-    On Error GoTo 0
-
+    ' Same-document copy onto the sheet page's layer. This is the only transfer that works
+    ' in this object model: the clipboard carries nothing across documents and CopyToLayer
+    ' refuses to cross them, so the whole imposition runs inside the duplicate.
+    srcShapes.CopyToLayer outPage.ActiveLayer
     Set dupShapes = p_NewShapesSince(outPage, beforeCount)
 
     ' Last resort: clipboard round-trip, with the source shapes selected first.
     If dupShapes.Count = 0 Then
-        srcDoc.Activate
         srcShapes.CreateSelection
         srcShapes.Copy
-        outDoc.Activate
         outPage.Activate
         outPage.ActiveLayer.Paste
         Set dupShapes = p_NewShapesSince(outPage, beforeCount)
@@ -309,9 +292,7 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
                "First source shape locked      : " & CStr(srcLocked) & vbCrLf & _
                "Source active layer            : " & srcLayer & vbCrLf & _
                "Shapes on the sheet page before: " & CStr(beforeCount) & vbCrLf & _
-               "Shapes on the sheet page after : " & CStr(outPage.Shapes.Count) & vbCrLf & vbCrLf & _
-               "Export: " & expInfo & "   (file created: " & CStr(madeFile) & ")" & vbCrLf & _
-               "Import: " & impInfo, _
+               "Shapes on the sheet page after : " & CStr(outPage.Shapes.Count), _
                vbExclamation, "Imposition"
         Exit Sub
     End If
