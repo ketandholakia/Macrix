@@ -93,9 +93,10 @@ is VB6-format and CorelDRAW's VBE cannot load it reliably).
 - **`vittixImposition` also defines `RunImposition` (and `BuildPageOrder`,
   `PlacePageInCell`, `DrawCropMarks`) in both `ImpositionMacro.bas` and
   `modImposition.bas`** — likely one module is a superseded copy of the other.
-- **Source of truth moved here.** The original `vittixcdrMacro` checkout (and its
-  GitHub remote) still exists with its own uncommitted work; archive it to avoid
-  divergence.
+- **Source of truth moved here.** The original `vittixcdrMacro` checkout is now
+  marked archived **locally** (`ARCHIVED.md` + a README banner, commit `0048ff4`);
+  its uncommitted work was deliberately preserved there. Its public remote
+  `ketandholakia/Vittix-CDR-Macro` (visibility: public) is **not yet archived**.
 - Per-macro `Sync-To-GMS.ps1` / `Sync-From-GMS.ps1` are near-duplicates differing
   only by the hard-coded project name.
 - `Sync-*-GMS.ps1` call `GetActiveObject("CorelDRAW.Application")`, which fails for a
