@@ -16,6 +16,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Sub UserForm_Initialize()
+    Me.Caption = "Macrix Dimension"
     LoadFormState
     On Error Resume Next
     ' Enter activates OK, Esc activates Cancel.
@@ -42,7 +43,11 @@ Private Sub cmdOK_Click()
     On Error GoTo ErrHandler
     ReadSettingsFromForm Me, gSettings
     SaveSettings
-    MacrixTools_Create
+    If ActiveDocument Is Nothing Then
+        MsgBox "Open a document before creating dimensions.", vbExclamation, "Vittix"
+        Exit Sub
+    End If
+    CreateDimensionsForSelection gSettings
     Unload Me
     Exit Sub
 ErrHandler:

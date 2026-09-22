@@ -124,6 +124,9 @@ try {
 Option Explicit
 
 Private Sub UserForm_Initialize()
+    ' Belt and braces: the design-time caption is set when the form is built, but
+    ' re-assert it here so the title is right even if only the code is deployed.
+    Me.Caption = "Macrix Dimension"
     LoadFormState
     On Error Resume Next
     ' Enter activates OK, Esc activates Cancel.

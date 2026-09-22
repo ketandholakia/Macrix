@@ -6,6 +6,18 @@ CHANGELOG entry here, not just internal refactors (§43).
 
 ## [Unreleased]
 
+### Changed — Vittix → Macrix rebrand finished for the live projects
+- CorelDRAW projects renamed in the GMS folder: `VittixDimensionTools.gms` →
+  **`MacrixTools.gms`**, `VittixSelectSame.gms` → `MacrixSelectSame.gms`,
+  `vittixBleed.gms` → `macrixBleed.gms`, `vittixImposition.gms` → `macrixImposition.gms`.
+  The name stored *inside* each `.gms` was updated as well — the project name lives in the
+  file, not merely in the filename.
+- `MacrixTools`: entry point is **`modMain.MacrixDimension`** (macro list = 1 entry), the
+  dialog caption is set at design time and re-asserted in `UserForm_Initialize`, and
+  settings persist under the **`Macrix`** key.
+- Added `build/rebrand-live.ps1` (guarded: refuses to run while CorelDRAW is open).
+- Note: `vittix.gms` (the original framework scaffold) was left untouched.
+
 ### Added — developer tooling & CI
 - **`build/new-feature.ps1`** — scaffolds a new feature module from
   `build/templates/feat_template.bas` (safe-run skeleton pre-wired), reserves an
