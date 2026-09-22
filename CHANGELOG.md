@@ -22,6 +22,18 @@ CHANGELOG entry here, not just internal refactors (§43).
   CI files to LF.
 - **`docs/WORKFLOW.md`** — the end-to-end macro development loop.
 
+### Added — macro sources migrated into this repo
+- Migrated the four macro projects from the standalone `vittixcdrMacro` checkout
+  into `macros/` (`VittixSelectSame`, `vittixBleed`, `vittixdimension`,
+  `vittixImposition`), together with their per-macro sync scripts, the shared
+  docs/installer/scripts, and the two demo `.cdr` files. 61 files, every one
+  hash-verified against the source; the migration included the previously
+  **uncommitted/untracked** work (notably the whole `vittixImposition` macro).
+  Generated output (`build/`, `release/`, `dist/`) and VCS/editor folders were
+  excluded.
+- `macros/registry.json` now points at the in-repo copies (`macroRoot: "macros"`).
+- `.gitattributes`: `.cdr` treated as binary.
+
 ### Added — multi-macro support
 - **`macros/registry.json`** — declarative registry of the CorelDRAW macro projects
   this framework manages (id, Global Macro Project name, folder, entry points,

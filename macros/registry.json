@@ -1,7 +1,9 @@
 {
   "schema": "vittix.macro-registry/v1",
-  "macroRoot": "..\\vittixcdrMacro",
+  "macroRoot": "macros",
   "notes": [
+    "Macro sources live in this repository under macros/<dir> (migrated from the",
+    "original checkout github.com/ketandholakia/Vittix-CDR-Macro, MIT).",
     "Each entry is a separate CorelDRAW VBA project with its own .gms file.",
     "They are NOT modules of the Vittix project: several module names collide across",
     "macros (modSettings, modUnits, mdlFormBuilder), so they must stay separate projects.",

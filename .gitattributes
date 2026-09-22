@@ -20,3 +20,5 @@
 *.gms  binary
 *.zip  binary
 *.exe  binary
+*.cdr  binary
+*.frx  binary

@@ -42,6 +42,7 @@ build/
     installer/INNO_SETUP_TEMPLATE.iss
 tools/dev-import/modDevImport.bas   In-app bootstrap importer (runs inside CorelDRAW)
 macros/registry.json              Declarative list of the managed CorelDRAW macro projects
+macros/<macro>/{src,forms,scripts}  Macros themselves (migrated; one folder per .gms project)
 .github/workflows/validate.yml   CI: runs build/validate.ps1 on push/PR
 docs/DEPLOYMENT.md               How source reaches a CorelDRAW .gms project
 docs/MACROS.md                   The macros this framework manages + their layout

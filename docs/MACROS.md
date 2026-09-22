@@ -40,14 +40,18 @@ projects**, not as features of one project.
 
 ## Macro root
 
-Sources are found under a **macro root**. Default: the sibling checkout
-`..\vittixcdrMacro`. Override with:
+The macro sources **live in this repository** under `macros\<dir>` — migrated
+from the original checkout (`github.com/ketandholakia/Vittix-CDR-Macro`, MIT),
+including its uncommitted work. `macros/README.md`, `macros/LICENSE`,
+`macros/docs/`, `macros/installer/` and the root `macros/scripts/` are carried over
+from that checkout for provenance and tooling.
 
-- `build/macros.ps1 -MacroRoot <path>`, or
-- the `VITTIX_MACRO_ROOT` environment variable.
+The macro root defaults to `macros` and can be overridden with
+`build/macros.ps1 -MacroRoot <path>` or the `VITTIX_MACRO_ROOT` environment
+variable (useful to point at a separate checkout).
 
-When the macro root is absent (e.g. on a CI runner), `validate.ps1` **warns** rather
-than failing, so static CI stays green off-machine.
+When the macro root is absent, `validate.ps1` prints an informational line (not a
+warning), so static CI stays green off-machine.
 
 ## Commands
 
@@ -58,7 +62,7 @@ powershell -File build/macros.ps1 -Json      # machine-readable dump
 powershell -File build/validate.ps1          # includes macro-registry drift checks
 ```
 
-## Known issues in the macro checkout (as of the first inventory)
+## Known issues in the migrated macro sources
 
 - **`mdlFormBuilder.bas` exists in three macros at three different revisions**
   (13.4 KB / 17.5 KB / 18.9 KB) — a shared module copy-pasted and diverged.
