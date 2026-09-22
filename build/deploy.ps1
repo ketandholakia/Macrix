@@ -12,10 +12,16 @@
 
   DIRECTION
     (default)      plan a PUSH: source files -> project components
-    -Apply         actually push
+    -Apply         actually push (-OutDir <dir> also copies the saved .gms out)
     -Pull          plan a PULL: project components -> source files
     -Pull -Apply   actually pull (overwrites source; git-tracked, so recoverable)
     -List          enumerate loaded GMS projects and their macros
+
+  BUILDING A BINARY .gms
+    A .gms is a proprietary binary (magic 'GMS\x01') that only CorelDRAW can write.
+    -Apply imports the source and saves the project, producing the binary; -OutDir
+    copies it out as a build artifact. Requires CorelDRAW (use -StartCorel when it is
+    not already running).
 
   SAFETY
     * Dry run by default: nothing is written unless -Apply is passed.
@@ -48,7 +54,8 @@ param(
     [switch]$Stage,
     [switch]$StartCorel,
     [switch]$KeepCorel,
-    [switch]$SkipValidate
+    [switch]$SkipValidate,
+    [string]$OutDir
 )
 
 $ErrorActionPreference = 'Stop'
@@ -158,6 +165,11 @@ if (-not $app) {
     exit 2
 }
 
+# A freshly launched automation instance exposes NO VBA project model until
+# InitializeVBA() is called -- Application.VBE is $null before that (verified).
+try { [void]$app.InitializeVBA() } catch { }
+Start-Sleep -Milliseconds 800
+
 $vbe = Get-VBE -App $app
 if (-not $vbe) {
     Write-Host "CorelDRAW is running but Application.VBE is not accessible."
@@ -261,6 +273,16 @@ $plan | Format-Table -AutoSize | Out-String | Write-Host
 Write-Host "[4/4] " -NoNewline
 if (-not $Apply) { Write-Host "DRY RUN -- nothing written. Re-run with -Apply to import."; exit 0 }
 
+# Record the project file state so we can tell whether CorelDRAW wrote it back.
+$gmsPath = $null
+try { if ($proj.FileName) { $gmsPath = $proj.FileName } } catch { }
+$gmsBefore = $null
+if ($gmsPath -and (Test-Path -LiteralPath $gmsPath)) {
+    $fi = Get-Item -LiteralPath $gmsPath
+    $gmsBefore = $fi.LastWriteTime
+    Write-Host ("Project file before: {0} ({1} bytes)" -f $gmsPath, $fi.Length)
+}
+
 Write-Host "applying ..."
 $ok = 0; $fail = 0
 foreach ($m in $modules) {
@@ -277,15 +299,43 @@ foreach ($m in $modules) {
     }
 }
 
-$saved = 'not attempted'
+# VBProject.SaveAs is NOT supported for a .gms ("Method or property is not valid in
+# this type of project"). CorelDRAW persists a loaded macro project itself when the
+# project/instance closes, so the sequence is: import -> quit -> verify on disk.
+$saveNote = 'deferred to CorelDRAW'
 try {
-    if ($proj.FileName) { $proj.SaveAs($proj.FileName); $saved = 'saved' }
-    else { $saved = 'project has no FileName; save manually in the VBE' }
-} catch { $saved = "save failed: $($_.Exception.Message)" }
+    if ($proj.FileName) { $proj.SaveAs($proj.FileName); $saveNote = 'saved via VBProject.SaveAs' }
+}
+catch { $saveNote = 'VBProject.SaveAs unsupported for .gms; relying on CorelDRAW persist-on-close' }
 
-Write-Host "`nImported $ok, failed $fail. Project save: $saved"
-Write-Host "Note: a loaded .gms may also be persisted by CorelDRAW when the project is unloaded/closed - verify in the VBE."
+Write-Host "`nImported $ok, failed $fail. Save: $saveNote"
 
-if ($owned -and -not $KeepCorel) { try { $app.Quit() } catch { } }
+if ($owned -and -not $KeepCorel) {
+    Write-Host 'Closing the automation instance so CorelDRAW flushes the project ...'
+    try { $app.Quit() } catch { }
+    Start-Sleep -Seconds 3
+}
+
+if ($gmsPath -and (Test-Path -LiteralPath $gmsPath)) {
+    $fi = Get-Item -LiteralPath $gmsPath
+    $flag = $(if ($gmsBefore -ne $fi.LastWriteTime) { '  [rewritten]' } else { '  [unchanged]' })
+    Write-Host ("Project file after : {0} bytes, {1}{2}" -f $fi.Length, $fi.LastWriteTime, $flag)
+
+    if ($OutDir) {
+        try {
+            if (-not (Test-Path -LiteralPath $OutDir)) { New-Item -ItemType Directory -Path $OutDir -Force | Out-Null }
+            $destGms = Join-Path $OutDir (Split-Path $gmsPath -Leaf)
+            Copy-Item -LiteralPath $gmsPath -Destination $destGms -Force
+            $b = [System.IO.File]::ReadAllBytes($destGms)
+            $magic = (($b[0..3]) | ForEach-Object { $_.ToString('X2') }) -join ' '
+            Write-Host ("Binary GMS built -> {0}  ({1} bytes, magic {2})" -f $destGms, $b.Length, $magic)
+        }
+        catch { Write-Host "OutDir copy failed: $($_.Exception.Message)" }
+    }
+}
+else {
+    Write-Host 'Note: project has no FileName; save manually in the VBE.'
+}
+
 if ($fail -gt 0) { exit 1 }
 exit 0

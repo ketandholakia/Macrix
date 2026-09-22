@@ -22,6 +22,21 @@ CHANGELOG entry here, not just internal refactors (§43).
   CI files to LF.
 - **`docs/WORKFLOW.md`** — the end-to-end macro development loop.
 
+### Added — binary .gms build (dimension-tools)
+- **`build/deploy.ps1 -OutDir <dir>`** copies the rebuilt `.gms` out as a build
+  artifact after a push.
+- **Fixed:** `deploy.ps1` now calls `Application.InitializeVBA()` before touching
+  `Application.VBE`. A freshly launched automation instance exposes **no** VBA project
+  model until then (`VBE` was `$null`), so deploying against a new instance would have
+  failed with "VBE not accessible".
+- `VBProject.SaveAs` is not supported for `.gms`; CorelDRAW persists the project when
+  the instance closes, and `deploy.ps1` now quits-then-verifies instead of reporting a
+  false failure. Re-runs with unchanged sources are byte-identical.
+- **Verified on CorelDRAW 2021 (v23.5.0.506):** rebuilt `VittixDimensionTools.gms`
+  (115730 → 112146 bytes, magic `GMS\x01`) and confirmed the artifact re-loads with
+  all 9 modules plus the preserved `frmDimension`/`UserForm1`.
+- `docs/DEPLOYMENT.md`: new "Building a binary `.gms`" section.
+
 ### Added — per-macro pipeline (dimension-tools first)
 - **`build/deploy.ps1` now takes `-Macro <id>`** and resolves the target from the
   registry: source dir, `forms` handling, and the CorelDRAW project name. It does

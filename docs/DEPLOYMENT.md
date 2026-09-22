@@ -119,6 +119,40 @@ save, save from the VBE or unload/reload the project.
 
 ---
 
+## Building a binary `.gms`
+
+A `.gms` is a proprietary CorelDRAW binary (magic bytes `47 4D 53 01` = `GMS\x01`),
+not an OLE/VBA project file, so it **cannot be assembled from `.bas` text by any
+external tool** — only CorelDRAW writes it.
+
+`build/deploy.ps1 -Macro <id> -Apply` imports the macro's modules into the matching
+CorelDRAW project and then closes the instance, at which point CorelDRAW flushes the
+project back to its `.gms`. Add `-OutDir <dir>` to also copy the resulting binary out
+as a build artifact:
+
+```powershell
+powershell -File build/deploy.ps1 -Macro dimension-tools -Apply -StartCorel `
+    -OutDir build\_out\macros\dimension-tools
+# -> build\_out\macros\dimension-tools\VittixDimensionTools.gms  (magic 47 4D 53 01)
+```
+
+Behaviour confirmed against a live CorelDRAW 2021 (v23.5.0.506):
+
+- **`Application.InitializeVBA()` is required on a freshly launched automation
+  instance.** Until it is called, `Application.VBE` is `$null` and
+  `GMSManager.Projects` is empty; afterwards all `.gms` projects load automatically.
+  `deploy.ps1` calls it for you.
+- **`VBProject.SaveAs` is not supported for `.gms`** — it raises *"Method or property
+  is not valid in this type of project"*. Persistence happens when CorelDRAW closes
+  the project/instance, so `deploy.ps1` quits the instance it started and then checks
+  the file on disk. A re-run with unchanged sources leaves the file byte-identical
+  (the build is deterministic).
+- The import **replaces only the modules whose names match the source** and leaves
+  every other component untouched (`frmDimension`, `UserForm1`, `ThisMacroStorage`
+  all survive).
+- Always keep a copy before rebuilding: `build\_out\gms-backup\` holds the previous
+  `.gms`.
+
 ## Legacy
 
 `build/sync_gms_modules.bat` still works (it copies `.bas`/`.frm` into the GMS folder
