@@ -65,9 +65,12 @@ Public Sub RunImposition()
     orderLen = UBound(orderArr) - LBound(orderArr) + 1
     totalSheets = Int((orderLen - 1) / pagesPerSheet) + 1
 
-    ' Cell size: divide usable sheet area evenly, accounting for gutters
-    cellW = (g_SheetWidth - 2 * g_MarginLeft - (g_GridCols - 1) * g_GutterX) / g_GridCols
-    cellH = (g_SheetHeight - 2 * g_MarginTop - (g_GridRows - 1) * g_GutterY) / g_GridRows
+    ' Cell size comes from the SOURCE PAGE, not from the dialog's sheet fields: each page is
+    ' placed at 1:1, so no scaling is needed. The sheet is then sized to hold the grid.
+    cellW = srcDoc.Pages(1).SizeWidth
+    cellH = srcDoc.Pages(1).SizeHeight
+    g_SheetWidth = 2 * g_MarginLeft + g_GridCols * cellW + (g_GridCols - 1) * g_GutterX
+    g_SheetHeight = 2 * g_MarginTop + g_GridRows * cellH + (g_GridRows - 1) * g_GutterY
 
     Application.Optimization = True
     Application.EventsEnabled = False
