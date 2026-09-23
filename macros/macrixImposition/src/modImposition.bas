@@ -323,6 +323,24 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
         newShapes(idx).Move cellX, cellY
     Next idx
 
+    ' One-shot geometry report for the first cell. Percentages in a screenshot can't tell me
+    ' whether the numbers are wrong or the interpretation is, so print them once.
+    Static geomReported As Boolean
+    If Not geomReported Then
+        geomReported = True
+        MsgBox "cell      : x=" & CStr(Round(cellX, 3)) & "  y=" & CStr(Round(cellY, 3)) & _
+               "  w=" & CStr(Round(cellW, 3)) & "  h=" & CStr(Round(cellH, 3)) & vbCrLf & _
+               "sheet     : " & CStr(Round(g_SheetWidth, 3)) & " x " & CStr(Round(g_SheetHeight, 3)) & vbCrLf & _
+               "source pg : " & CStr(Round(outDoc.Pages(srcPageIdx).SizeWidth, 3)) & " x " & _
+               CStr(Round(outDoc.Pages(srcPageIdx).SizeHeight, 3)) & vbCrLf & _
+               "sheet pg  : " & CStr(Round(outPage.SizeWidth, 3)) & " x " & CStr(Round(outPage.SizeHeight, 3)) & vbCrLf & _
+               "copied    : " & CStr(nNew) & " shape(s)" & vbCrLf & _
+               "after move: left=" & CStr(Round(newShapes(1).LeftX, 3)) & _
+               "  top=" & CStr(Round(newShapes(1).TopY, 3)) & vbCrLf & _
+               "doc unit  : " & CStr(outDoc.Unit) & "   refpoint: " & CStr(outDoc.ReferencePoint), _
+               vbInformation, "Imposition geometry"
+    End If
+
     ' If the source page is bigger than the cell, you may want to scale
     ' it down to fit instead of clipping. Uncomment to enable fit-scaling:
     '
