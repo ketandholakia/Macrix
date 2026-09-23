@@ -279,18 +279,22 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
     ' in this object model: the clipboard carries nothing across documents and CopyToLayer
     ' refuses to cross them, so the whole imposition runs inside the duplicate.
     srcShapes.CopyToLayer outPage.ActiveLayer
-    Set dupShapes = p_NewShapesSince(outPage, beforeCount)
 
-    ' Last resort: clipboard round-trip, with the source shapes selected first.
-    If dupShapes.Count = 0 Then
-        srcShapes.CreateSelection
-        srcShapes.Copy
-        outPage.Activate
-        outPage.ActiveLayer.Paste
-        Set dupShapes = p_NewShapesSince(outPage, beforeCount)
+    ' Collect the copied shapes into a plain ARRAY. A hand-built ShapeRange does not
+    ' enumerate reliably, so For Each over it silently moved nothing -- which is why the
+    ' artwork stayed at its original position while the frame appeared to move.
+    Dim newShapes() As Shape
+    Dim nNew As Long
+    Dim idx As Long
+    nNew = outPage.Shapes.Count - beforeCount
+    If nNew > 0 Then
+        ReDim newShapes(1 To nNew)
+        For idx = 1 To nNew
+            Set newShapes(idx) = outPage.Shapes(beforeCount + idx)
+        Next idx
     End If
 
-    If dupShapes.Count = 0 Then
+    If nNew = 0 Then
         ' Nothing landed on the sheet page. Report the counts rather than failing
         ' silently (and do NOT fall back to Document.Selection -- it is a pointer-typed
         ' member that raises "Run-time error 13: Type mismatch" when assigned in VBA).
@@ -313,13 +317,11 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
     End If
 
     ' Position: the copied objects keep their PAGE coordinates, so shifting by exactly the
-    ' cell offset puts the source page's top-left on the cell's top-left. (Using the
-    ' objects' own LeftX as the delta only nudged them, which is why they stayed centred.)
-    ' Moved shape by shape: Shape.Move is the call the working dimension macro uses.
-    Dim movingShape As Shape
-    For Each movingShape In dupShapes
-        movingShape.Move cellX, cellY
-    Next movingShape
+    ' cell offset puts the source page's top-left on the cell's top-left. Moved shape by
+    ' shape with Shape.Move -- the call the working dimension macro uses.
+    For idx = 1 To nNew
+        newShapes(idx).Move cellX, cellY
+    Next idx
 
     ' If the source page is bigger than the cell, you may want to scale
     ' it down to fit instead of clipping. Uncomment to enable fit-scaling:
