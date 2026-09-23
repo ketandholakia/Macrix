@@ -19,6 +19,15 @@ Attribute VB_Name = "modImposition"
 ' almost always SetPosition / Layer assignment / CreateLineSegment
 ' — check the equivalent method name in your version's VBA object
 ' browser (F2 in the VBA IDE, search "Shape" or "Layer").
+'
+' 2026-09 FIX: cell Y was computed top-down (small Y = top row),
+' but CorelDRAW's page coordinate system is bottom-up (Y = 0 is the
+' BOTTOM of the page). That flip made rows land in the wrong half of
+' the sheet. Also removed the "invisible alignment frame" rectangle
+' hack in PlacePageInCell — it isn't needed (each source page's local
+' origin is always (0,0), so the move delta is already known), and
+' when its NoFill/zero-outline calls silently failed it left a full
+' page-sized black-bordered box in the cell.
 '==============================================================
 
 Option Explicit
@@ -106,7 +115,13 @@ Public Sub RunImposition()
                     Dim cellX As Double, cellY As Double
                     Dim pageNum As Integer
                     cellX = g_MarginLeft + c * (cellW + g_GutterX)
-                    cellY = g_MarginTop + r * (cellH + g_GutterY)
+
+                    ' r = 0 is the FIRST/TOP row. CorelDRAW's page coordinates are
+                    ' bottom-up (Y = 0 is the bottom of the page), so the row's Y
+                    ' offset has to be measured DOWN from the top of the sheet, not
+                    ' up from g_MarginTop. Without this, row 0 lands at the bottom.
+                    cellY = g_SheetHeight - g_MarginTop - cellH - r * (cellH + g_GutterY)
+
                     pageNum = orderArr(slotIndex)
 
                     If pageNum <> 0 And pageNum <= totalPages Then
@@ -246,9 +261,7 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
 
     Dim srcPage As Page
     Dim srcShapes As ShapeRange
-    Dim dupShapes As ShapeRange
     Dim originalActiveDoc As Document
-    Dim beforeShapes As ShapeRange
     Dim beforeCount As Long
     Dim i As Long
 
@@ -256,24 +269,10 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
     Set srcPage = outDoc.Pages(srcPageIdx)
     If srcPage.Shapes.Count = 0 Then Exit Sub
 
-    ' Give the copy a page-sized, unfilled/unstroked frame. The objects alone carry no
-    ' page reference -- "Shapes.All" is just the artwork -- so the copy had no page extent
-    ' to align and the sizing was lost. The frame makes the copied range span the page.
-    On Error Resume Next
-    Dim frameShape As Shape
-    Set frameShape = srcPage.ActiveLayer.CreateRectangle(0, 0, srcPage.SizeWidth, srcPage.SizeHeight)
-    If Not frameShape Is Nothing Then
-        frameShape.Fill.ApplyNoFill
-        frameShape.Outline.Width = 0
-    End If
-    Err.Clear
-    On Error GoTo 0
-
     Set srcShapes = srcPage.Shapes.All
     If srcShapes Is Nothing Then Exit Sub
 
-    Set beforeShapes = outPage.Shapes.All
-    beforeCount = beforeShapes.Count
+    beforeCount = outPage.Shapes.Count
 
     ' Same-document copy onto the sheet page's layer. This is the only transfer that works
     ' in this object model: the clipboard carries nothing across documents and CopyToLayer
@@ -295,76 +294,28 @@ Private Sub PlacePageInCell(srcDoc As Document, srcPageIdx As Integer, _
     End If
 
     If nNew = 0 Then
-        ' Nothing landed on the sheet page. Report the counts rather than failing
-        ' silently (and do NOT fall back to Document.Selection -- it is a pointer-typed
-        ' member that raises "Run-time error 13: Type mismatch" when assigned in VBA).
-        Dim srcLocked As Boolean
-        Dim srcLayer As String
-        srcLocked = False
-        srcLayer = "?"
-        On Error Resume Next
-        srcLocked = srcPage.Shapes(1).Locked
-        srcLayer = srcPage.ActiveLayer.Name
-        On Error GoTo 0
-        MsgBox "Nothing was pasted for source page " & CStr(srcPageIdx) & "." & vbCrLf & vbCrLf & _
-               "Shapes on the source page      : " & CStr(srcPage.Shapes.Count) & vbCrLf & _
-               "First source shape locked      : " & CStr(srcLocked) & vbCrLf & _
-               "Source active layer            : " & srcLayer & vbCrLf & _
-               "Shapes on the sheet page before: " & CStr(beforeCount) & vbCrLf & _
-               "Shapes on the sheet page after : " & CStr(outPage.Shapes.Count), _
-               vbExclamation, "Imposition"
+        ' Nothing landed on the sheet page. Log rather than fail silently, but don't
+        ' block the run with a modal box -- that hides the fact that other cells may
+        ' still be placing correctly.
+        Debug.Print "modImposition: nothing pasted for source page " & CStr(srcPageIdx) & _
+                    " (shapes on source: " & CStr(srcPage.Shapes.Count) & ")"
         Exit Sub
     End If
 
-    ' Position: the copied objects keep their PAGE coordinates, so shifting by exactly the
-    ' cell offset puts the source page's top-left on the cell's top-left. Moved shape by
-    ' shape with Shape.Move -- the call the working dimension macro uses.
+    ' Position: the copied objects keep their PAGE-LOCAL coordinates (every CorelDRAW page
+    ' shares the same bottom-left-origin coordinate frame), so a source page's own top-left
+    ' is always at local (0, cellH). Moving by exactly (cellX, cellY) — where cellY is the
+    ' cell's own BOTTOM edge in the sheet's coordinate space — lands the page exactly in its
+    ' cell regardless of where the artwork sits within the page. Shape.Move is a relative
+    ' offset, not an absolute position, which is why this must be the caller-computed delta,
+    ' not the desired final coordinate on its own.
     For idx = 1 To nNew
         newShapes(idx).Move cellX, cellY
     Next idx
 
-    ' One-shot geometry report for the first cell. Percentages in a screenshot can't tell me
-    ' whether the numbers are wrong or the interpretation is, so print them once.
-    Static geomReported As Boolean
-    If Not geomReported Then
-        geomReported = True
-        MsgBox "cell      : x=" & CStr(Round(cellX, 3)) & "  y=" & CStr(Round(cellY, 3)) & _
-               "  w=" & CStr(Round(cellW, 3)) & "  h=" & CStr(Round(cellH, 3)) & vbCrLf & _
-               "sheet     : " & CStr(Round(g_SheetWidth, 3)) & " x " & CStr(Round(g_SheetHeight, 3)) & vbCrLf & _
-               "source pg : " & CStr(Round(outDoc.Pages(srcPageIdx).SizeWidth, 3)) & " x " & _
-               CStr(Round(outDoc.Pages(srcPageIdx).SizeHeight, 3)) & vbCrLf & _
-               "sheet pg  : " & CStr(Round(outPage.SizeWidth, 3)) & " x " & CStr(Round(outPage.SizeHeight, 3)) & vbCrLf & _
-               "copied    : " & CStr(nNew) & " shape(s)" & vbCrLf & _
-               "after move: left=" & CStr(Round(newShapes(1).LeftX, 3)) & _
-               "  top=" & CStr(Round(newShapes(1).TopY, 3)) & vbCrLf & _
-               "doc unit  : " & CStr(outDoc.Unit) & "   refpoint: " & CStr(outDoc.ReferencePoint), _
-               vbInformation, "Imposition geometry"
-    End If
-
-    ' If the source page is bigger than the cell, you may want to scale
-    ' it down to fit instead of clipping. Uncomment to enable fit-scaling:
-    '
-    ' Dim scaleFactor As Double
-    ' scaleFactor = Application.Min(cellW / dupShapes.SizeWidth, cellH / dupShapes.SizeHeight)
-    ' dupShapes.SetSize dupShapes.SizeWidth * scaleFactor, dupShapes.SizeHeight * scaleFactor
-    ' dupShapes.SetPosition cellX, cellY
-
     originalActiveDoc.Activate
 
 End Sub
-
-' Collect the shapes added to a page since a given count (CopyToLayer/Paste return
-' pointer-typed values that VBA can surface as Nothing, so count instead).
-Private Function p_NewShapesSince(thePage As Page, ByVal sinceCount As Long) As ShapeRange
-    On Error Resume Next
-    Dim result As ShapeRange
-    Dim k As Long
-    Set result = New ShapeRange
-    For k = sinceCount + 1 To thePage.Shapes.Count
-        result.Add thePage.Shapes(k)
-    Next k
-    Set p_NewShapesSince = result
-End Function
 
 '--------------------------------------------------------------
 ' Draws 8 short crop-mark lines (2 per corner) just outside the
@@ -381,10 +332,10 @@ Private Sub DrawCropMarks(outDoc As Document, outPage As Page, _
     Set lyr = outPage.ActiveLayer
 
     Dim corners(3, 1) As Double ' 4 corners: (x, y) of each trim corner
-    corners(0, 0) = cellX:           corners(0, 1) = cellY               ' top-left
-    corners(1, 0) = cellX + cellW:   corners(1, 1) = cellY               ' top-right
-    corners(2, 0) = cellX:           corners(2, 1) = cellY + cellH       ' bottom-left
-    corners(3, 0) = cellX + cellW:   corners(3, 1) = cellY + cellH       ' bottom-right
+    corners(0, 0) = cellX:           corners(0, 1) = cellY               ' bottom-left
+    corners(1, 0) = cellX + cellW:   corners(1, 1) = cellY               ' bottom-right
+    corners(2, 0) = cellX:           corners(2, 1) = cellY + cellH       ' top-left
+    corners(3, 0) = cellX + cellW:   corners(3, 1) = cellY + cellH       ' top-right
 
     Dim i As Integer
     For i = 0 To 3
