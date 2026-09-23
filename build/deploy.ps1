@@ -57,10 +57,25 @@ param(
     [switch]$SkipValidate,
     [string]$OutDir,
     [string]$RemoveComponents,
-    [string]$RunMacro
+    [string]$RunMacro,
+    [switch]$Force
 )
 
 $ErrorActionPreference = 'Stop'
+
+# Refuse to run against a live interactive CorelDRAW: it holds the .gms files and rewrites
+# them when it exits, and closing it would discard whatever the user has open. Pass -Force
+# only when you know the running instance is an automation instance you own.
+if (-not $Force) {
+    $liveCorel = Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.ProcessName -match '(?i)corel' }
+    if ($liveCorel) {
+        Write-Host 'CorelDRAW is running - close it first.'
+        Write-Host '  It holds the .gms files and rewrites them on exit, so deploying now would be'
+        Write-Host '  lost (or would close your session). Re-run when CorelDRAW is closed, or pass'
+        Write-Host '  -Force if the running instance is an automation instance you own.'
+        exit 7
+    }
+}
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 
 function Get-GmsDir {
