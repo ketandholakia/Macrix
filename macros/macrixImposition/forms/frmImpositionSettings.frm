@@ -88,7 +88,16 @@ Private Sub cmdRun_Click()
     g_StepRepeatSheetCount = CInt(NzNum(txtStepRepeatSheetCount.Text, 1))
 
     Unload Me
-    RunImposition
+
+    ' Persist only after a successful run. Guarded so a registry problem
+    ' can never break the imposition itself. Cancel, failed validation
+    ' (exited above) and a failed/erroring run never reach this save.
+    If RunImposition() Then
+        On Error Resume Next
+        SaveCurrentSettings
+        Err.Clear
+        On Error GoTo 0
+    End If
 
 End Sub
 

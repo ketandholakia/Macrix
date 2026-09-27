@@ -261,7 +261,16 @@ Private Sub InjectCodeBehind(ByVal codeMod As Object)
     s = s & "    g_StepRepeatSheetCount = CInt(NzNum(txtStepRepeatSheetCount.Text, 1))" & vbCrLf
     s = s & "" & vbCrLf
     s = s & "    Unload Me" & vbCrLf
-    s = s & "    RunImposition" & vbCrLf
+    s = s & "" & vbCrLf
+    s = s & "    ' Persist only after a successful run. Guarded so a registry problem" & vbCrLf
+    s = s & "    ' can never break the imposition itself. Cancel, failed validation" & vbCrLf
+    s = s & "    ' (exited above) and a failed/erroring run never reach this save." & vbCrLf
+    s = s & "    If RunImposition() Then" & vbCrLf
+    s = s & "        On Error Resume Next" & vbCrLf
+    s = s & "        SaveCurrentSettings" & vbCrLf
+    s = s & "        Err.Clear" & vbCrLf
+    s = s & "        On Error GoTo 0" & vbCrLf
+    s = s & "    End If" & vbCrLf
     s = s & "" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "" & vbCrLf
